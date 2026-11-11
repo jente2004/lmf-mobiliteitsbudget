@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LMF Mobiliteitsbudget</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <div class="logo" onclick="showPage('dashboard')">
+        <svg viewBox="0 0 120 50" class="logo-svg" aria-label="LMF logo">
+          <path d="M8 12 L8 38 L18 38 L18 28 L28 38 L40 38 L26 22 L40 12 L28 12 L18 22 L18 12 Z" fill="currentColor"/>
+          <path d="M48 12 L48 38 L68 38 C78 38 82 30 82 25 C82 18 76 12 68 12 Z M58 20 L68 20 C70 20 72 22 72 25 C72 28 70 30 68 30 L58 30 Z" fill="currentColor"/>
+          <path d="M90 12 L90 38 L110 38 L110 30 L100 30 L100 12 Z" fill="currentColor"/>
+          <!-- small vehicle accent -->
+          <circle cx="105" cy="42" r="4" fill="currentColor" opacity="0.9"/>
+          <rect x="92" y="36" width="18" height="6" rx="2" fill="currentColor" opacity="0.7"/>
+        </svg>
+        <span class="logo-text">Mobiliteitsbudget</span>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+        <button class="nav-btn" data-page="aanvraag">Aanvraag</button>
+        <button class="nav-btn" data-page="info">Informatie</button>
+        <button class="nav-btn" data-page="chat">Assistent</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- DASHBOARD -->
+    <section id="page-dashboard" class="page active">
+      <div class="container">
+        <h1>Mijn mobiliteitsbudget</h1>
+        <p class="subtitle">Overzicht van je aanvraag en status</p>
+
+        <div class="status-card" id="statusCard">
+          <div class="status-header">
+            <h2>Stand van zaken</h2>
+            <span class="status-badge" id="statusBadge">Geen aanvraag</span>
+          </div>
+          <div class="timeline" id="timeline">
+            <div class="timeline-step" data-step="ingediend">
+              <div class="step-dot"></div>
+              <div class="step-label">Aanvraag ingediend</div>
+            </div>
+            <div class="timeline-step" data-step="verwerkt">
+              <div class="step-dot"></div>
+              <div class="step-label">In behandeling</div>
+            </div>
+            <div class="timeline-step" data-step="afgerond">
+              <div class="step-dot"></div>
+              <div class="step-label">Afgerond</div>
+            </div>
+          </div>
+          <div class="status-details" id="statusDetails">
+            <p>Je hebt nog geen aanvraag ingediend. Start hieronder een nieuwe aanvraag.</p>
+          </div>
+        </div>
+
+        <div class="cards-grid">
+          <div class="card">
+            <h3>Pijler 1</h3>
+            <p class="card-title">Milieuvriendelijke bedrijfswagen</p>
+            <p class="card-desc">Elektrische of zero-emissie wagen (vanaf 2026 uitsluitend zero-emissie)</p>
+            <div class="card-amount" id="p1Amount">—</div>
+          </div>
+          <div class="card">
+            <h3>Pijler 2</h3>
+            <p class="card-title">Duurzame mobiliteit & huisvesting</p>
+            <p class="card-desc">Fiets, OV, deelmobiliteit, huur/hypotheek (max. 10 km van werk)</p>
+            <div class="card-amount" id="p2Amount">—</div>
+          </div>
+          <div class="card">
+            <h3>Pijler 3</h3>
+            <p class="card-title">Cash saldo</p>
+            <p class="card-desc">Restbedrag na pijler 1 & 2 (bijdrage 38,07%)</p>
+            <div class="card-amount" id="p3Amount">—</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" onclick="showPage('aanvraag')">Nieuwe of wijzig aanvraag</button>
+          <button class="btn btn-secondary" onclick="showPage('info')">Bekijk informatietablad</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- AANVRAAG -->
+    <section id="page-aanvraag" class="page">
+      <div class="container">
+        <h1>Aanvraag mobiliteitsbudget</h1>
+        <p class="subtitle">Dien een nieuwe aanvraag in of wijzig een bestaande. Kies hoe je het budget over de drie pijlers wilt verdelen.</p>
+
+        <form id="aanvraagForm" class="form">
+          <div class="form-group">
+            <label for="jaarBudget">Jaarlijks mobiliteitsbudget (€)</label>
+            <input type="number" id="jaarBudget" min="3233" max="17244" step="1" value="10000" required />
+            <small>Minimum 2026: € 3.233 – Maximum: € 17.244 of 20% van brutojaarloon</small>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="p1">Pijler 1 – Bedrijfswagen (€)</label>
+              <input type="number" id="p1" min="0" step="1" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="p2">Pijler 2 – Duurzame mobiliteit (€)</label>
+              <input type="number" id="p2" min="0" step="1" value="0" />
+            </div>
+            <div class="form-group">
+              <label for="p3">Pijler 3 – Cash saldo (€)</label>
+              <input type="number" id="p3" min="0" step="1" value="0" readonly />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="opmerkingen">Opmerkingen / motivatie</label>
+            <textarea id="opmerkingen" rows="3" placeholder="Optioneel: leg uit waarom je voor deze verdeling kiest..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>
+              <input type="checkbox" id="akkoord" required />
+              Ik bevestig dat ik de voorwaarden ken en dat mijn aanvraag schriftelijk deel uitmaakt van de arbeidsovereenkomst.
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Aanvraag indienen / wijzigen</button>
+            <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+          </div>
+        </form>
+
+        <div id="formFeedback" class="feedback hidden"></div>
+      </div>
+    </section>
+
+    <!-- INFO -->
+    <section id="page-info" class="page">
+      <div class="container">
+        <h1>Informatietablad Mobiliteitsbudget</h1>
+        <p class="subtitle">Wetgeving, voorwaarden en belangrijke data (situatie 2026)</p>
+
+        <div class="info-grid">
+          <article class="info-card">
+            <h2>Wat is het mobiliteitsbudget?</h2>
+            <p>Het mobiliteitsbudget is een wettelijk systeem waarbij een werknemer zijn (recht op een) bedrijfswagen kan inruilen voor een jaarlijks budget. Dat budget mag verdeeld worden over drie pijlers.</p>
+          </article>
+
+          <article class="info-card">
+            <h2>De drie pijlers</h2>
+            <ul>
+              <li><strong>Pijler 1</strong> – Milieuvriendelijke bedrijfswagen (vanaf 2026 uitsluitend zero-emissie / elektrische wagen).</li>
+              <li><strong>Pijler 2</strong> – Duurzame vervoermiddelen (fiets, e-bike, OV, deelmobiliteit, …) en bepaalde huisvestingskosten (woning max. 10 km vogelvlucht van de normale werkplek).</li>
+              <li><strong>Pijler 3</strong> – Restsaldo dat cash wordt uitbetaald (één keer per jaar). Er geldt een bijzondere werknemersbijdrage van <strong>38,07%</strong>.</li>
+            </ul>
+          </article>
+
+          <article class="info-card">
+            <h2>Bedragen 2026</h2>
+            <ul>
+              <li>Minimum: <strong>€ 3.233</strong> per kalenderjaar</li>
+              <li>Absoluut maximum: <strong>€ 17.244</strong> per kalenderjaar</li>
+              <li>Persoonlijk maximum: max. 20% van het totale brutojaarloon</li>
+            </ul>
+            <p>Het budget wordt berekend op basis van de Total Cost of Ownership (TCO) van de (in te ruilen) bedrijfswagen.</p>
+          </article>
+
+          <article class="info-card">
+            <h2>Wanneer kom je in aanmerking?</h2>
+            <ul>
+              <li>Je hebt een bedrijfswagen of komt er volgens het bedrijfswagenbeleid voor in aanmerking.</li>
+              <li>De werkgever moet het systeem hebben ingevoerd (en zelf minstens 36 maanden bedrijfswagens ter beschikking hebben gesteld, tenzij de onderneming jonger is).</li>
+              <li>De aanvraag en de positieve beslissing van de werkgever gebeuren schriftelijk en maken deel uit van de arbeidsovereenkomst.</li>
+            </ul>
+          </article>
+
+          <article class="info-card">
+            <h2>Belangrijke data & termijnen</h2>
+            <ul>
+              <li>Vanaf 1 januari 2026: pijler 1 enkel nog zero-emissiewagens (besteld/geleased vanaf die datum).</li>
+              <li>Uitbetaling pijler 3: uiterlijk met het loon van de eerste maand van het volgende kalenderjaar.</li>
+              <li>Indexatie van de grensbedragen gebeurt jaarlijks op 1 januari.</li>
+            </ul>
+          </article>
+
+          <article class="info-card">
+            <h2>Wetgeving</h2>
+            <p>Wet van 17 maart 2019 betreffende de invoering van een mobiliteitsbudget (en latere wijzigingen). De werkgever bepaalt welke opties binnen pijler 2 aangeboden worden, binnen de wettelijke grenzen.</p>
+            <p class="note">Dit is een informatieve samenvatting. Raadpleeg steeds de officiële teksten of HR voor bindende informatie.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAT -->
+    <section id="page-chat" class="page">
+      <div class="container">
+        <h1>LMF Assistent</h1>
+        <p class="subtitle">Stel je vraag over het mobiliteitsbudget. Kan ik je niet helpen, dan verwijs ik je door naar HR.</p>
+
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+              <div class="message-avatar">LMF</div>
+              <div class="message-content">
+                Hallo! Ik ben de LMF Assistent. Waarmee kan ik je helpen over het mobiliteitsbudget?<br><br>
+                Voorbeelden: <em>“Hoeveel bedraagt het mobiliteitsbudget in 2026?”</em> of <em>“Wat mag ik doen met pijler 2?”</em>
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <input type="text" id="chatInput" placeholder="Typ je vraag..." autocomplete="off" />
+            <button class="btn btn-primary" id="chatSend">Verstuur</button>
+          </div>
+          <div class="quick-questions">
+            <button class="chip" data-q="Hoeveel bedraagt het mobiliteitsbudget in 2026?">Budget 2026</button>
+            <button class="chip" data-q="Wat zijn de drie pijlers?">Drie pijlers</button>
+            <button class="chip" data-q="Wanneer kom ik in aanmerking?">Aanmerking</button>
+            <button class="chip" data-q="Wat is de bijdrage op pijler 3?">Bijdrage pijler 3</button>
+            <button class="chip" data-q="Kan ik huisvestingskosten betalen?">Huisvesting</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>LMF Mobiliteitsbudget tool · Demo voor intern gebruik · Gebaseerd op de Belgische wetgeving (situatie 2026)</p>
+      <p class="footer-note">Bij twijfel of specifieke situaties: neem rechtstreeks contact op met HR.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
