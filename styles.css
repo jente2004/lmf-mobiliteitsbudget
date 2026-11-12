@@ -214,7 +214,7 @@ body.app-body {
   padding: 0.3rem 0.55rem; font: inherit; font-size: 0.78rem; cursor: pointer;
 }
 .filter-btn.active { background: var(--maroon); color: #fff; border-color: var(--maroon); }
-.hr-layout { display: grid; grid-template-columns: 1.4fr 1fr; gap: 0.7rem; align-items: start; }
+.hr-layout { display: grid; grid-template-columns: 1fr; gap: 0.7rem; align-items: start; }
 .hr-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
 .hr-table th, .hr-table td { padding: 0.45rem 0.4rem; text-align: left; border-bottom: 1px solid var(--border); }
 .hr-table th { font-size: 0.72rem; color: var(--muted); font-weight: 600; }
