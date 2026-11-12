@@ -525,7 +525,7 @@ function saveFloMessages(list){ localStorage.setItem(FLO_MESSAGES_KEY, JSON.stri
 
 var DEMO_FLO_MESSAGES = [
   {id:'flo_elena_fiets', appId:'demo_elena_fiets', personeelsnummer:'2111', type:'goedgekeurd', text:'Goedgekeurd: Leasefiets (€1.200). Betaling: €100/maand gedurende 12 maanden, startend in december 2026.', date:'2026-11-05T10:30:00', replies:[{from:'user',text:'Bedankt, dat is duidelijk.'}]},
-  {id:'flo_elena_ov', appId:'demo_elena_ov', personeelsnummer:'2111', type:'info', text:'Openbaar vervoer (€600): we hebben nog een kopie van je abonnement nodig. Stuur dit door naar HR.', date:'2026-11-06T11:00:00', replies:[{from:'user',text:'Ik stuur het abonnement door.'}]},
+  {id:'flo_elena_ov', appId:'demo_elena_ov', personeelsnummer:'2111', type:'info', text:'Openbaar vervoer (€600): we hebben nog een kopie van je abonnement nodig. Vervolledig je aanvraag verder.', date:'2026-11-06T11:00:00', replies:[{from:'user',text:'Ik stuur het abonnement door.'}]},
   {id:'flo_elena_huur', appId:'demo_elena_huur', personeelsnummer:'2111', type:'info', text:'Huurkosten (€5.000): ontbrekende stukken. Voeg je huurcontract toe vooraleer we verder kunnen.', date:'2026-11-07T14:00:00'},
   {id:'flo_tom_1', appId:'demo_tom_deelauto_1', personeelsnummer:'2101', type:'goedgekeurd', text:'Deelauto januari: €420 ontvangen en afgehandeld.', date:'2026-01-18T11:00:00'},
   {id:'flo_tom_2', appId:'demo_tom_deelauto_2', personeelsnummer:'2101', type:'goedgekeurd', text:'Deelauto februari: €510 ontvangen en afgehandeld.', date:'2026-02-18T11:00:00'},
