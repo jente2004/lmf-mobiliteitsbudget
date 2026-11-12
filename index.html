@@ -67,22 +67,7 @@
 
       <div class="content">
         <section id="page-dashboard" class="page active">
-          <div class="panel">
-            <div class="panel-head">
-              <h2>Stand van zaken</h2>
-              <span class="status-badge" id="statusBadge">Geen aanvraag</span>
-            </div>
-            <div class="timeline" id="timeline">
-              <div class="timeline-step" data-step="ingediend"><div class="step-dot"></div><div class="step-label">Ingediend</div></div>
-              <div class="timeline-step" data-step="verwerkt"><div class="step-dot"></div><div class="step-label">In behandeling</div></div>
-              <div class="timeline-step" data-step="afgerond"><div class="step-dot"></div><div class="step-label">Afgerond</div></div>
-            </div>
-            <div class="status-details" id="statusDetails">
-              <p>Nog geen aanvraag. Ga naar Aanvraag in het menu.</p>
-            </div>
-          </div>
-
-          <div class="panel" style="margin-top:0.9rem" id="budgetPanel">
+          <div class="panel" id="budgetPanel">
             <div class="panel-head"><h2>Budgetoverzicht</h2></div>
             <div id="budgetBarContainer">
               <p class="hr-empty">Nog geen budgetgegevens.</p>
@@ -94,7 +79,7 @@
             <div class="my-apps-wrap">
               <table class="hr-table" id="myAppsTable">
                 <thead>
-                  <tr><th>Aanvraag</th><th>Bedrag</th><th>Status</th></tr>
+                  <tr><th>Datum</th><th>Aanvraag</th><th>Bedrag</th><th>Status</th></tr>
                 </thead>
                 <tbody id="myAppsBody"></tbody>
               </table>
