@@ -108,7 +108,10 @@ function showPage(pageId){
   var btn=document.querySelector('.nav-item[data-page="'+pageId+'"]');
   if (btn) btn.classList.add('active');
   var title=document.getElementById('pageTitle');
-  if (title) title.textContent=PAGE_TITLES[pageId]||'MoveFlow';
+  if (title) {
+    if (pageId==='chat' && role==='hr') title.textContent='Notificaties';
+    else title.textContent=PAGE_TITLES[pageId]||'MoveFlow';
+  }
   if (pageId==='dashboard') renderDashboard();
   if (pageId==='aanvraag') prefillForm();
   if (pageId==='hr') renderHrOverview();
@@ -541,7 +544,7 @@ var DEMO_FLO_MESSAGES = [
   {id:'flo_tom_10', appId:'demo_tom_deelauto_10', personeelsnummer:'2101', type:'info', text:'Deelauto oktober: €570 ontvangen en lopend.', date:'2026-10-18T11:00:00'},
   {id:'flo_riadh_wagen', appId:'demo_riadh_wagen', personeelsnummer:'2102', type:'goedgekeurd', text:'Goedgekeurd: Bedrijfswagen (€9.867). Betaling via loon vanaf januari 2027.', date:'2026-10-05T11:00:00', replies:[{from:'user',text:'Oké, dank je.'}]},
   {id:'flo_riadh_huur', appId:'demo_riadh_huur', personeelsnummer:'2102', type:'afgewezen', text:'Huurkosten (€2.133) afgewezen. Reden: woonplaats Vilvoorde ligt buiten de 10 km-straal van Kontich en je werkt niet 50% van thuis.', date:'2026-10-15T11:00:00'},
-  {id:'flo_hr_riadh_reject', appId:'demo_riadh_huur', personeelsnummer:'hr', type:'afgewezen', text:'Weigering Riadh Mané (2102): Huurkosten €2.133 afgewezen (Vilvoorde buiten 10 km + geen 50% thuiswerk). Flo heeft Riadh al op de hoogte gebracht.', date:'2026-10-15T11:05:00'}
+  {id:'flo_hr_riadh_reject', appId:'demo_riadh_huur', personeelsnummer:'hr', type:'afgewezen', text:'Weigering Riadh Mané (2102): Huurkosten €2.133 afgewezen (Vilvoorde buiten 10 km + geen 50% thuiswerk). Riadh is hierover al op de hoogte gebracht.', date:'2026-10-15T11:05:00'}
 ];
 
 function seedFloMessages(){
