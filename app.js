@@ -187,6 +187,7 @@ function validateApplication(data, opts){
   if (!data.adres||data.adres.trim().length<8) errors.adres='Vul een volledig woonadres in.';
   var total=Number(data.jaarBudget);
   if (!total||total<3233||total>17244) errors.jaarBudget='Budget moet tussen 3233 en 17244 liggen.';
+  if (!data.typeAanvraag) errors.typeAanvraag='Kies een type aanvraag.';
   if (requireAkkoord && !data.akkoord) errors.akkoord='Bevestiging is verplicht.';
   return errors;
 }
@@ -215,6 +216,7 @@ function prefillForm(){
     jaarInput.value=data.jaarBudget;
   }
   document.getElementById('opmerkingen').value='';
+  document.querySelectorAll('input[name="typeAanvraag"]').forEach(function(r){ r.checked=false; });
 }
 
 function resetForm(){
@@ -242,6 +244,7 @@ if (form){
       p2:0,
       p3:0,
       huisvesting:false,
+      typeAanvraag:(document.querySelector('input[name="typeAanvraag"]:checked')||{}).value||'',
       opmerkingen:document.getElementById('opmerkingen').value.trim(),
       akkoord:document.getElementById('akkoord').checked
     };
@@ -313,7 +316,7 @@ function renderDashboard(){
   tbody.innerHTML=myApps.map(function(a){
     var st=statusMap[a.status]||statusMap.ingediend;
     var d=a.submittedAt?new Date(a.submittedAt).toLocaleDateString('nl-BE'):'-';
-    var item=a.item||'Aanvraag';
+    var item=a.typeAanvraag||a.item||'Aanvraag';
     var statusLabel = a.status==='afgerond' ? 'Afgehandeld' : (a.status==='verwerkt' ? 'In behandeling' : 'Lopend');
     return '<tr><td>'+escapeHtml(d)+'</td><td><strong>'+escapeHtml(item)+'</strong></td><td>EUR '+Number((a.p1||0)+(a.p2||0)+(a.p3||0)).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+st.class+'">'+statusLabel+'</span></td></tr>';
   }).join('');
@@ -330,7 +333,7 @@ function renderDashboard(){
     html += '<div style="font-size:0.85rem;color:var(--muted)">Gebruikt: EUR ' + used.toLocaleString('nl-BE') + ' (' + pct + '%) · Resterend: EUR ' + remaining.toLocaleString('nl-BE') + '</div>';
     html += '<ul style="margin:0.6rem 0 0;padding-left:1.1rem;font-size:0.85rem">';
     myApps.forEach(function(a){
-      var item = a.item || a.opmerkingen || 'Aanvraag';
+      var item = a.typeAanvraag||a.item || a.opmerkingen || 'Aanvraag';
       var bedrag = (Number(a.p1)||0) + (Number(a.p2)||0) + (Number(a.p3)||0);
       if (bedrag > 0) html += '<li>' + escapeHtml(item) + ': EUR ' + bedrag.toLocaleString('nl-BE') + '</li>';
     });
@@ -367,7 +370,7 @@ function renderHrOverview(){
   filtered.sort(function(a,b){ return new Date(b.submittedAt)-new Date(a.submittedAt); });
   tbody.innerHTML=filtered.map(function(a){
     var naam=[a.voornaam,a.achternaam].filter(Boolean).join(' ');
-    var item=a.item?' ('+escapeHtml(a.item)+')':'';
+    var item=a.typeAanvraag||a.item?' ('+escapeHtml(a.typeAanvraag||a.item)+')':'';
     return '<tr data-id="'+a.id+'" class="'+(selectedHrId===a.id?'selected':'')+'" onclick="showHrDetail(\''+a.id+'\')"><td><strong>'+escapeHtml(naam)+'</strong>'+item+'</td><td>'+escapeHtml(a.personeelsnummer)+'</td><td>'+escapeHtml(a.afdeling||'-')+'</td><td>EUR '+Number(a.jaarBudget).toLocaleString('nl-BE')+'</td><td><select class="status-select" onclick="event.stopPropagation()" onchange="hrChangeStatus(\''+a.id+'\', this.value)"><option value="ingediend"'+(a.status==='ingediend'?' selected':'')+'>Openstaand</option><option value="verwerkt"'+(a.status==='verwerkt'?' selected':'')+'>In behandeling</option><option value="afgerond"'+(a.status==='afgerond'?' selected':'')+'>Afgerond</option></select></td><td><button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showHrDetail(\''+a.id+'\')">Bewerk</button></td></tr>';
   }).join('');
 }
@@ -387,7 +390,7 @@ function showHrDetail(id){
   var title=document.getElementById('hrDetailTitle');
   var fb=document.getElementById('hrEditFeedback');
   if (fb) fb.classList.add('hidden');
-  if (title) title.textContent=[app.voornaam,app.achternaam].filter(Boolean).join(' ') + (app.item?' – '+app.item:'');
+  if (title) title.textContent=[app.voornaam,app.achternaam].filter(Boolean).join(' ') + (app.typeAanvraag||app.item?' – '+(app.typeAanvraag||app.item):'');
   body.innerHTML='<form id="hrEditForm" class="hr-edit-grid" onsubmit="return saveHrEdit(event, \''+app.id+'\')"><div class="form-group"><label>Voornaam *</label><input type="text" id="hr-voornaam" value="'+escapeHtml(app.voornaam)+'" /><span class="field-error" id="err-hr-voornaam"></span></div><div class="form-group"><label>Achternaam *</label><input type="text" id="hr-achternaam" value="'+escapeHtml(app.achternaam)+'" /><span class="field-error" id="err-hr-achternaam"></span></div><div class="form-group"><label>Personeelsnr. *</label><input type="text" id="hr-personeelsnummer" value="'+escapeHtml(app.personeelsnummer)+'" /><span class="field-error" id="err-hr-personeelsnummer"></span></div><div class="form-group"><label>E-mail *</label><input type="email" id="hr-email" value="'+escapeHtml(app.email)+'" /><span class="field-error" id="err-hr-email"></span></div><div class="form-group"><label>Afdeling</label><input type="text" id="hr-afdeling" value="'+escapeHtml(app.afdeling||'')+'" /></div><div class="form-group full"><label>Woonadres *</label><input type="text" id="hr-adres" value="'+escapeHtml(app.adres||'')+'" /><span class="field-error" id="err-hr-adres"></span></div><div class="form-group"><label>Budget</label><input type="number" id="hr-jaarBudget" value="'+app.jaarBudget+'" /><span class="field-error" id="err-hr-jaarBudget"></span></div><div class="form-group"><label>Pijler 1</label><input type="number" id="hr-p1" value="'+app.p1+'" /></div><div class="form-group"><label>Pijler 2</label><input type="number" id="hr-p2" value="'+app.p2+'" /></div><div class="form-group"><label>Pijler 3</label><input type="number" id="hr-p3" value="'+app.p3+'" readonly /></div><div class="form-group full"><label class="check-label"><input type="checkbox" id="hr-huisvesting"'+(app.huisvesting?' checked':'')+' /> Huisvesting in pijler 2</label><span class="field-error" id="err-hr-huisvesting"></span></div><div class="form-group full"><label>Opmerkingen</label><textarea id="hr-opmerkingen" rows="2">'+escapeHtml(app.opmerkingen||'')+'</textarea></div><div class="form-group full form-actions"><button type="submit" class="btn btn-primary btn-sm">Wijzigingen opslaan</button></div></form>';
   var hp1=document.getElementById('hr-p1'), hp2=document.getElementById('hr-p2'), hp3=document.getElementById('hr-p3'), hj=document.getElementById('hr-jaarBudget');
   function sync(){ if(hp3) hp3.value=Math.max(0,(Number(hj.value)||0)-(Number(hp1.value)||0)-(Number(hp2.value)||0)); }
@@ -450,9 +453,9 @@ document.querySelectorAll('.filter-btn').forEach(function(btn){
 });
 
 var DEMO_APPLICATIONS=[
-  {id:'demo_elena_fiets',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:1200,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-05T10:00:00',item:'Leasefiets'},
-  {id:'demo_elena_ov',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'',status:'verwerkt',submittedAt:'2026-11-02T09:00:00',lastUpdate:'2026-11-06T10:00:00',item:'Openbaar vervoer'},
-  {id:'demo_elena_huur',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:5000,p3:0,huisvesting:true,opmerkingen:'',status:'ingediend',submittedAt:'2026-11-03T09:00:00',lastUpdate:'2026-11-07T10:00:00',item:'Huurkosten'},
+  {id:'demo_elena_fiets',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:1200,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-05T10:00:00',item:'Leasefiets',typeAanvraag:'Leasing (fiets, e-bike, motorfiets,...)'},
+  {id:'demo_elena_ov',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'',status:'verwerkt',submittedAt:'2026-11-02T09:00:00',lastUpdate:'2026-11-06T10:00:00',item:'Openbaar vervoer',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
+  {id:'demo_elena_huur',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:5000,p3:0,huisvesting:true,opmerkingen:'',status:'ingediend',submittedAt:'2026-11-03T09:00:00',lastUpdate:'2026-11-07T10:00:00',item:'Huurkosten',typeAanvraag:'Huurkost'},
   {id:'demo_tom',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:9000,p1:0,p2:6500,p3:2500,huisvesting:false,opmerkingen:'',status:'ingediend',submittedAt:'2026-11-08T10:15:00',lastUpdate:'2026-11-08T10:15:00'},
   {id:'demo_riadh',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Statiestraat 42, 2630 Aartselaar',jaarBudget:14500,p1:12000,p2:1500,p3:1000,huisvesting:false,opmerkingen:'',status:'verwerkt',submittedAt:'2026-10-20T09:00:00',lastUpdate:'2026-11-03T14:20:00'}
 ];
