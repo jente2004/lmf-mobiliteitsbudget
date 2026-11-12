@@ -24,6 +24,10 @@ function setMode(mode) {
   var mh = document.getElementById('modeHr');
   if (mw) mw.classList.toggle('active', !isHr);
   if (mh) mh.classList.toggle('active', isHr);
+  var navW = document.getElementById('navWerknemer');
+  var navH = document.getElementById('navHr');
+  if (navW) navW.classList.toggle('hidden', isHr);
+  if (navH) navH.classList.toggle('hidden', !isHr);
   var badge = document.getElementById('modeBadge');
   if (badge) badge.textContent = isHr ? 'Modus: HR' : 'Modus: Werknemer';
   showPage(isHr ? 'hr' : 'dashboard');
@@ -43,6 +47,10 @@ function showPage(pageId) {
   var mh = document.getElementById('modeHr');
   if (mw) mw.classList.toggle('active', !isHr);
   if (mh) mh.classList.toggle('active', isHr);
+  var navW = document.getElementById('navWerknemer');
+  var navH = document.getElementById('navHr');
+  if (navW) navW.classList.toggle('hidden', isHr);
+  if (navH) navH.classList.toggle('hidden', !isHr);
   var badge = document.getElementById('modeBadge');
   if (badge) badge.textContent = isHr ? 'Modus: HR' : 'Modus: Werknemer';
   if (pageId === 'dashboard') renderDashboard();
@@ -288,7 +296,7 @@ function renderDashboard() {
 }
 
 function escapeHtml(str) {
-  return String(str == null ? '' : str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+  return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 var hrFilter = 'all';
