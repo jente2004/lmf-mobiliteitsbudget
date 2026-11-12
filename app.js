@@ -484,10 +484,16 @@ var DEMO_APPLICATIONS=[
 
 function seedDemoData(){
   var list = loadAll();
+  // Remove any old Elena records that are not in the current demo set
+  var demoIds = DEMO_APPLICATIONS.map(function(d){ return d.id; });
+  list = list.filter(function(a){
+    if (a.personeelsnummer === '2111' && demoIds.indexOf(a.id) === -1) return false;
+    return true;
+  });
   DEMO_APPLICATIONS.forEach(function(demo){
     var idx = list.findIndex(function(a){ return a.id === demo.id; });
     if (idx >= 0){
-      list[idx] = Object.assign({}, list[idx], demo);
+      list[idx] = Object.assign({}, demo);
     } else {
       list.push(Object.assign({}, demo));
     }
