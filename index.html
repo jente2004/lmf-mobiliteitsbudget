@@ -88,11 +88,41 @@
     <section id="page-aanvraag" class="page">
       <div class="container">
         <h1>Aanvraag mobiliteitsbudget</h1>
-        <p class="subtitle">Dien een nieuwe aanvraag in of wijzig een bestaande. Kies hoe je het budget over de drie pijlers wilt verdelen.</p>
+        <p class="subtitle">Vul je persoonlijke gegevens in en kies hoe je het budget over de drie pijlers wilt verdelen.</p>
 
         <form id="aanvraagForm" class="form">
+          <h3 class="form-section-title">Persoonlijke gegevens</h3>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="voornaam">Voornaam *</label>
+              <input type="text" id="voornaam" required placeholder="Jan" />
+            </div>
+            <div class="form-group">
+              <label for="achternaam">Achternaam *</label>
+              <input type="text" id="achternaam" required placeholder="Peeters" />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="personeelsnummer">Personeelsnummer *</label>
+              <input type="text" id="personeelsnummer" required placeholder="bv. 12345" />
+            </div>
+            <div class="form-group">
+              <label for="email">E-mailadres *</label>
+              <input type="email" id="email" required placeholder="jan.peeters@bedrijf.be" />
+            </div>
+          </div>
+
           <div class="form-group">
-            <label for="jaarBudget">Jaarlijks mobiliteitsbudget (€)</label>
+            <label for="afdeling">Afdeling / Team</label>
+            <input type="text" id="afdeling" placeholder="bv. Logistiek, HR, Sales..." />
+          </div>
+
+          <h3 class="form-section-title">Budgetverdeling</h3>
+
+          <div class="form-group">
+            <label for="jaarBudget">Jaarlijks mobiliteitsbudget (€) *</label>
             <input type="number" id="jaarBudget" min="3233" max="17244" step="1" value="10000" required />
             <small>Minimum 2026: € 3.233 – Maximum: € 17.244 of 20% van brutojaarloon</small>
           </div>
@@ -120,7 +150,7 @@
           <div class="form-group">
             <label>
               <input type="checkbox" id="akkoord" required />
-              Ik bevestig dat ik de voorwaarden ken en dat mijn aanvraag schriftelijk deel uitmaakt van de arbeidsovereenkomst.
+              Ik bevestig dat de ingevulde gegevens correct zijn en dat mijn aanvraag schriftelijk deel uitmaakt van de arbeidsovereenkomst.
             </label>
           </div>
 
