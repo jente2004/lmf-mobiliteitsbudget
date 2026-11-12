@@ -15,6 +15,7 @@ function showPage(pageId) {
   if (btn) btn.classList.add('active');
 
   if (pageId === 'dashboard') renderDashboard();
+  if (pageId === 'aanvraag') prefillForm();
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
@@ -54,6 +55,22 @@ function updateP3() {
   el.addEventListener('input', updateP3);
 });
 
+function prefillForm() {
+  const data = loadData();
+  if (!data) return;
+
+  document.getElementById('voornaam').value = data.voornaam || '';
+  document.getElementById('achternaam').value = data.achternaam || '';
+  document.getElementById('personeelsnummer').value = data.personeelsnummer || '';
+  document.getElementById('email').value = data.email || '';
+  document.getElementById('afdeling').value = data.afdeling || '';
+  jaarInput.value = data.jaarBudget || 10000;
+  p1Input.value = data.p1 || 0;
+  p2Input.value = data.p2 || 0;
+  document.getElementById('opmerkingen').value = data.opmerkingen || '';
+  updateP3();
+}
+
 function resetForm() {
   form.reset();
   jaarInput.value = 10000;
@@ -65,6 +82,13 @@ function resetForm() {
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
+
+  const voornaam = document.getElementById('voornaam').value.trim();
+  const achternaam = document.getElementById('achternaam').value.trim();
+  const personeelsnummer = document.getElementById('personeelsnummer').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const afdeling = document.getElementById('afdeling').value.trim();
+
   const total = Number(jaarInput.value);
   const p1 = Number(p1Input.value) || 0;
   const p2 = Number(p2Input.value) || 0;
@@ -88,6 +112,11 @@ form.addEventListener('submit', (e) => {
   }
 
   const data = {
+    voornaam,
+    achternaam,
+    personeelsnummer,
+    email,
+    afdeling,
     jaarBudget: total,
     p1,
     p2,
@@ -100,7 +129,7 @@ form.addEventListener('submit', (e) => {
 
   saveData(data);
 
-  feedback.textContent = 'Je aanvraag is succesvol ingediend / bijgewerkt. Je ziet de status op het dashboard.';
+  feedback.textContent = 'Je aanvraag is succesvol ingediend / bijgewerkt. Je ziet de status en je gegevens op het dashboard.';
   feedback.className = 'feedback success';
   feedback.classList.remove('hidden');
 
@@ -183,21 +212,24 @@ function renderDashboard() {
     day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
   });
 
-  let extra = '';
-  if (data.opmerkingen) {
-    extra = `<p><strong>Opmerkingen:</strong> ${escapeHtml(data.opmerkingen)}</p>`;
-  }
+  const naam = [data.voornaam, data.achternaam].filter(Boolean).join(' ') || 'Onbekend';
+  const afdelingRegel = data.afdeling ? `<p><strong>Afdeling:</strong> ${escapeHtml(data.afdeling)}</p>` : '';
+  const opmerkingenRegel = data.opmerkingen ? `<p><strong>Opmerkingen:</strong> ${escapeHtml(data.opmerkingen)}</p>` : '';
 
   details.innerHTML = `
+    <p><strong>Aanvrager:</strong> ${escapeHtml(naam)}</p>
+    <p><strong>Personeelsnummer:</strong> ${escapeHtml(data.personeelsnummer || '—')}</p>
+    <p><strong>E-mail:</strong> ${escapeHtml(data.email || '—')}</p>
+    ${afdelingRegel}
     <p><strong>Ingediend op:</strong> ${dateStr}</p>
     <p><strong>Totaal budget:</strong> € ${data.jaarBudget.toLocaleString('nl-BE')}</p>
-    ${extra}
+    ${opmerkingenRegel}
     <p style="margin-top:0.5rem;font-size:0.9rem;">Status wordt automatisch bijgewerkt in deze demo. In productie gebeurt dit door HR.</p>
   `;
 }
 
 function escapeHtml(str) {
-  return str.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
+  return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
 }
 
 // --- Chatbot (FAQ) ---
@@ -295,7 +327,6 @@ function handleChat() {
   addMessage(escapeHtml(text), true);
   input.value = '';
 
-  // small delay for natural feel
   setTimeout(() => {
     const answer = findAnswer(text);
     addMessage(answer, false);
