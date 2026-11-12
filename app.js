@@ -279,7 +279,8 @@ function renderDashboard(){
   var statusMap={
     ingediend:{ label:'Openstaand', class:'ingediend' },
     verwerkt:{ label:'In behandeling', class:'verwerkt' },
-    afgerond:{ label:'Afgerond', class:'afgerond' }
+    afgerond:{ label:'Afgerond', class:'afgerond' },
+    afgewezen:{ label:'Afgewezen', class:'afgewezen' }
   };
   if (!data){
     if (badge){ badge.textContent='Geen aanvraag'; badge.className='status-badge'; }
@@ -318,14 +319,18 @@ function renderDashboard(){
     var st=statusMap[a.status]||statusMap.ingediend;
     var d=a.submittedAt?new Date(a.submittedAt).toLocaleDateString('nl-BE'):'-';
     var item=a.typeAanvraag||a.item||'Aanvraag';
-    var statusLabel = a.status==='afgerond' ? 'Afgehandeld' : (a.status==='verwerkt' ? 'In behandeling' : 'Lopend');
-    return '<tr><td>'+escapeHtml(d)+'</td><td><strong>'+escapeHtml(item)+'</strong></td><td>EUR '+Number((a.p1||0)+(a.p2||0)+(a.p3||0)).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+st.class+'">'+statusLabel+'</span></td></tr>';
+    var statusLabel = a.status==='afgewezen' ? 'Afgewezen' : (a.status==='afgerond' ? 'Afgehandeld' : (a.status==='verwerkt' ? 'In behandeling' : 'Lopend'));
+    var statusClass = a.status==='afgewezen' ? 'afgewezen' : st.class;
+    return '<tr><td>'+escapeHtml(d)+'</td><td><strong>'+escapeHtml(item)+'</strong></td><td>EUR '+Number((a.p1||0)+(a.p2||0)+(a.p3||0)).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+statusClass+'">'+statusLabel+'</span></td></tr>';
   }).join('');
 
   var barContainer=document.getElementById('budgetBarContainer');
   if (barContainer && myApps.length){
     var total = Number(myApps[0].jaarBudget) || 0;
-    var used = myApps.reduce(function(sum, a){ return sum + (Number(a.p1)||0) + (Number(a.p2)||0) + (Number(a.p3)||0); }, 0);
+    var used = myApps.reduce(function(sum, a){ 
+      if (a.status==='afgewezen') return sum;
+      return sum + (Number(a.p1)||0) + (Number(a.p2)||0) + (Number(a.p3)||0); 
+    }, 0);
     var remaining = Math.max(0, total - used);
     var pct = total ? Math.round(used / total * 100) : 0;
     var html = '<div style="margin-bottom:0.6rem"><strong>Totaal budget:</strong> EUR ' + total.toLocaleString('nl-BE') + '</div>';
@@ -335,7 +340,7 @@ function renderDashboard(){
     myApps.forEach(function(a){
       var item = a.typeAanvraag||a.item || a.opmerkingen || 'Aanvraag';
       var bedrag = (Number(a.p1)||0) + (Number(a.p2)||0) + (Number(a.p3)||0);
-      if (bedrag > 0) html += '<li>' + escapeHtml(item) + ': EUR ' + bedrag.toLocaleString('nl-BE') + '</li>';
+      if (bedrag > 0 && a.status!=='afgewezen') html += '<li>' + escapeHtml(item) + ': EUR ' + bedrag.toLocaleString('nl-BE') + '</li>';
     });
     html += '</ul>';
     barContainer.innerHTML = html;
@@ -467,7 +472,7 @@ var DEMO_APPLICATIONS=[
   {id:'demo_tom_deelauto_9',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:460,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-09-15T10:00:00',lastUpdate:'2026-09-20T10:00:00',item:'Deelauto september',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
   {id:'demo_tom_deelauto_10',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:570,p3:0,huisvesting:false,opmerkingen:'',status:'ingediend',submittedAt:'2026-10-15T10:00:00',lastUpdate:'2026-10-20T10:00:00',item:'Deelauto oktober',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
   {id:'demo_riadh_wagen',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Kerkstraat 12, 1800 Vilvoorde',jaarBudget:12000,p1:9867,p2:0,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-10-01T09:00:00',lastUpdate:'2026-10-05T10:00:00',item:'Bedrijfswagen',typeAanvraag:'Bedrijfswagen'},
-  {id:'demo_riadh_huur',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Kerkstraat 12, 1800 Vilvoorde',jaarBudget:12000,p1:0,p2:2133,p3:0,huisvesting:true,opmerkingen:'',status:'afgerond',submittedAt:'2026-10-10T09:00:00',lastUpdate:'2026-10-15T10:00:00',item:'Huurkosten (afgewezen)',typeAanvraag:'Huurkost'}
+  {id:'demo_riadh_huur',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Kerkstraat 12, 1800 Vilvoorde',jaarBudget:12000,p1:0,p2:2133,p3:0,huisvesting:true,opmerkingen:'',status:'afgewezen',submittedAt:'2026-10-10T09:00:00',lastUpdate:'2026-10-15T10:00:00',item:'Huurkosten (afgewezen)',typeAanvraag:'Huurkost'}
 ];
 
 function seedDemoData(){
