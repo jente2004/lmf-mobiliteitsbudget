@@ -23,13 +23,40 @@ function getRole() {
   return sessionStorage.getItem(ROLE_KEY) || null;
 }
 
+const DEMO_USERS = {
+  'hr@logimove.be': { password: 'hr', role: 'hr' },
+  'werknemer@logimove.be': { password: 'werknemer', role: 'werknemer' }
+};
+
 function loginAs(role) {
   sessionStorage.setItem(ROLE_KEY, role);
   applySession();
 }
 
+function tryLogin(email, password) {
+  var key = (email || '').trim().toLowerCase();
+  var user = DEMO_USERS[key];
+  var err = document.getElementById('loginError');
+  if (!user || user.password !== password) {
+    if (err) {
+      err.textContent = 'Onjuiste e-mail of wachtwoord.';
+      err.classList.remove('hidden');
+    }
+    return false;
+  }
+  if (err) err.classList.add('hidden');
+  loginAs(user.role);
+  return true;
+}
+
 function logout() {
   sessionStorage.removeItem(ROLE_KEY);
+  var email = document.getElementById('loginEmail');
+  var pass = document.getElementById('loginPassword');
+  if (email) email.value = '';
+  if (pass) pass.value = '';
+  var err = document.getElementById('loginError');
+  if (err) err.classList.add('hidden');
   applySession();
 }
 
@@ -537,11 +564,16 @@ document.querySelectorAll('.chip').forEach(function(chip) {
 
 updateP3();
 
-var btnLoginW = document.getElementById('loginWerknemer');
-var btnLoginH = document.getElementById('loginHr');
+var loginForm = document.getElementById('loginForm');
 var btnLogout = document.getElementById('logoutBtn');
-if (btnLoginW) btnLoginW.addEventListener('click', function() { loginAs('werknemer'); });
-if (btnLoginH) btnLoginH.addEventListener('click', function() { loginAs('hr'); });
+if (loginForm) {
+  loginForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var email = document.getElementById('loginEmail');
+    var pass = document.getElementById('loginPassword');
+    tryLogin(email ? email.value : '', pass ? pass.value : '');
+  });
+}
 if (btnLogout) btnLogout.addEventListener('click', logout);
 
 applySession();
