@@ -99,7 +99,7 @@ function applySession(){
 function showPage(pageId){
   var role=getRole();
   if (!role) return;
-  if (role==='hr' && pageId!=='hr') return;
+  if (role==='hr' && pageId!=='hr' && pageId!=='chat') return;
   if (role==='werknemer' && pageId==='hr') return;
   document.querySelectorAll('.page').forEach(function(p){ p.classList.remove('active'); });
   document.querySelectorAll('.nav-item').forEach(function(b){ b.classList.remove('active'); });
@@ -382,7 +382,9 @@ function renderHrOverview(){
   tbody.innerHTML=filtered.map(function(a){
     var naam=[a.voornaam,a.achternaam].filter(Boolean).join(' ');
     var item=a.typeAanvraag||a.item?' ('+escapeHtml(a.typeAanvraag||a.item)+')':'';
-    return '<tr data-id="'+a.id+'" class="'+(selectedHrId===a.id?'selected':'')+'" onclick="showHrDetail(\''+a.id+'\')"><td><strong>'+escapeHtml(naam)+'</strong>'+item+'</td><td>'+escapeHtml(a.personeelsnummer)+'</td><td>'+escapeHtml(a.afdeling||'-')+'</td><td>EUR '+Number(a.jaarBudget).toLocaleString('nl-BE')+'</td><td><select class="status-select" onclick="event.stopPropagation()" onchange="hrChangeStatus(\''+a.id+'\', this.value)"><option value="ingediend"'+(a.status==='ingediend'?' selected':'')+'>Openstaand</option><option value="verwerkt"'+(a.status==='verwerkt'?' selected':'')+'>In behandeling</option><option value="afgerond"'+(a.status==='afgerond'?' selected':'')+'>Afgerond</option></select></td><td><button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showHrDetail(\''+a.id+'\')">Bewerk</button></td></tr>';
+    var stClass = a.status==='afgewezen'?'afgewezen':(a.status==='afgerond'?'afgerond':(a.status==='verwerkt'?'verwerkt':'ingediend'));
+    var stLabel = a.status==='afgewezen'?'Afgewezen':(a.status==='afgerond'?'Afgerond':(a.status==='verwerkt'?'In behandeling':'Openstaand'));
+    return '<tr data-id="'+a.id+'" class="'+(selectedHrId===a.id?'selected':'')+'" onclick="showHrDetail(\''+a.id+'\')"><td><strong>'+escapeHtml(naam)+'</strong>'+item+'</td><td>'+escapeHtml(a.personeelsnummer)+'</td><td>'+escapeHtml(a.afdeling||'-')+'</td><td>EUR '+Number(a.jaarBudget).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+stClass+'">'+stLabel+'</span> <select class="status-select" onclick="event.stopPropagation()" onchange="hrChangeStatus(\''+a.id+'\', this.value)"><option value="ingediend"'+(a.status==='ingediend'?' selected':'')+'>Openstaand</option><option value="verwerkt"'+(a.status==='verwerkt'?' selected':'')+'>In behandeling</option><option value="afgerond"'+(a.status==='afgerond'?' selected':'')+'>Afgerond</option><option value="afgewezen"'+(a.status==='afgewezen'?' selected':'')+'>Afgewezen</option></select></td><td><button type="button" class="btn btn-secondary btn-sm" onclick="event.stopPropagation();showHrDetail(\''+a.id+'\')">Bewerk</button></td></tr>';
   }).join('');
 }
 
@@ -533,7 +535,8 @@ var DEMO_FLO_MESSAGES = [
   {id:'flo_tom_9', appId:'demo_tom_deelauto_9', personeelsnummer:'2101', type:'goedgekeurd', text:'Deelauto september: €460 ontvangen en afgehandeld.', date:'2026-09-18T11:00:00'},
   {id:'flo_tom_10', appId:'demo_tom_deelauto_10', personeelsnummer:'2101', type:'info', text:'Deelauto oktober: €570 ontvangen en lopend.', date:'2026-10-18T11:00:00'},
   {id:'flo_riadh_wagen', appId:'demo_riadh_wagen', personeelsnummer:'2102', type:'goedgekeurd', text:'Goedgekeurd: Bedrijfswagen (€9.867). Betaling via loon vanaf januari 2027.', date:'2026-10-05T11:00:00', replies:[{from:'user',text:'Oké, dank je.'}]},
-  {id:'flo_riadh_huur', appId:'demo_riadh_huur', personeelsnummer:'2102', type:'afgewezen', text:'Huurkosten (€2.133) afgewezen. Reden: woonplaats Vilvoorde ligt buiten de 10 km-straal van Kontich en je werkt niet 50% van thuis.', date:'2026-10-15T11:00:00'}
+  {id:'flo_riadh_huur', appId:'demo_riadh_huur', personeelsnummer:'2102', type:'afgewezen', text:'Huurkosten (€2.133) afgewezen. Reden: woonplaats Vilvoorde ligt buiten de 10 km-straal van Kontich en je werkt niet 50% van thuis.', date:'2026-10-15T11:00:00'},
+  {id:'flo_hr_riadh_reject', appId:'demo_riadh_huur', personeelsnummer:'hr', type:'afgewezen', text:'Weigering Riadh Mané (2102): Huurkosten €2.133 afgewezen (Vilvoorde buiten 10 km + geen 50% thuiswerk). Flo heeft Riadh al op de hoogte gebracht.', date:'2026-10-15T11:05:00'}
 ];
 
 function seedFloMessages(){
@@ -563,7 +566,11 @@ function renderFloHistory(){
   var container = document.getElementById('floHistory');
   if (!container) return;
   var key = getCurrentUserKey();
-  var msgs = loadFloMessages().filter(function(m){ return m.personeelsnummer && m.personeelsnummer===key; }).slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+  var role = getRole();
+  var msgs = loadFloMessages().filter(function(m){
+    if (role==='hr') return m.personeelsnummer==='hr';
+    return m.personeelsnummer && m.personeelsnummer===key;
+  }).slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
   if (!msgs.length){
     container.innerHTML = '<p class="hr-empty">Nog geen meldingen.</p>';
     return;
