@@ -20,18 +20,20 @@
           <p>Mobiliteitsbudget · LogiMove</p>
         </div>
       </div>
-      <p class="login-intro">Kies je rol om in te loggen. Je ziet enkel de onderdelen die bij die rol horen.</p>
-      <div class="login-roles">
-        <button type="button" class="login-role-btn" id="loginWerknemer">
-          <span class="login-role-title">Werknemer</span>
-          <span class="login-role-desc">Dossier · aanvraag · info · Flo</span>
-        </button>
-        <button type="button" class="login-role-btn" id="loginHr">
-          <span class="login-role-title">HR</span>
-          <span class="login-role-desc">Process manager · alle aanvragen</span>
-        </button>
-      </div>
-      <p class="login-hint">Demo · geen wachtwoord nodig</p>
+      <p class="login-intro">Log in met je LogiMove-account. Je ziet enkel de onderdelen van jouw rol.</p>
+      <form id="loginForm" class="login-form">
+        <div class="login-field">
+          <label for="loginEmail">E-mail</label>
+          <input type="email" id="loginEmail" placeholder="naam@logimove.be" autocomplete="username" required />
+        </div>
+        <div class="login-field">
+          <label for="loginPassword">Wachtwoord</label>
+          <input type="password" id="loginPassword" placeholder="Wachtwoord" autocomplete="current-password" required />
+        </div>
+        <p class="login-error hidden" id="loginError">Onjuiste e-mail of wachtwoord.</p>
+        <button type="submit" class="btn btn-primary login-submit">Inloggen</button>
+      </form>
+      <p class="login-hint">Demo: werknemer@logimove.be / werknemer · hr@logimove.be / hr</p>
     </div>
   </div>
 
