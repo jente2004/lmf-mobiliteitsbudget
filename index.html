@@ -3,330 +3,299 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MoveFlow – Mobiliteitsbudget</title>
+  <title>MoveFlow</title>
   <link rel="stylesheet" href="styles.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 </head>
-<body>
-  <header class="header">
-    <div class="container header-inner">
-      <div class="logo" onclick="showPage('dashboard')">
-        <img src="logo.png" alt="MoveFlow logo" class="logo-img" />
-        <span class="logo-text">MoveFlow</span>
+<body class="app-body">
+  <div class="app-shell">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-brand" onclick="showPage('dashboard')">
+        <img src="logo.png" alt="MoveFlow" class="sidebar-logo" />
+        <div>
+          <span class="sidebar-title">MoveFlow</span>
+          <span class="sidebar-sub">Mobiliteitsbudget</span>
+        </div>
       </div>
-      <nav class="nav">
-        <button class="nav-btn active" data-page="dashboard">Dashboard</button>
-        <button class="nav-btn" data-page="aanvraag">Aanvraag</button>
-        <button class="nav-btn" data-page="info">Informatie</button>
-        <button class="nav-btn" data-page="chat">Assistent</button>
-        <button class="nav-btn nav-hr" data-page="hr">HR-overzicht</button>
+
+      <nav class="sidebar-nav">
+        <p class="nav-group">Werknemer</p>
+        <button class="nav-item active" data-page="dashboard">
+          <span class="nav-icon">&#9632;</span> Mijn dossier
+        </button>
+        <button class="nav-item" data-page="aanvraag">
+          <span class="nav-icon">&#9998;</span> Aanvraag
+        </button>
+        <button class="nav-item" data-page="info">
+          <span class="nav-icon">&#8505;</span> Info & regels
+        </button>
+        <button class="nav-item" data-page="chat">
+          <span class="nav-icon">&#9786;</span> Flo assistent
+        </button>
+
+        <p class="nav-group">HR / Process</p>
+        <button class="nav-item nav-hr" data-page="hr">
+          <span class="nav-icon">&#9776;</span> Process manager
+        </button>
       </nav>
-    </div>
-  </header>
 
-  <main class="main">
-    <!-- DASHBOARD (werknemer) -->
-    <section id="page-dashboard" class="page active">
-      <div class="container">
-        <h1>Mijn mobiliteitsbudget</h1>
-        <p class="subtitle">Overzicht van je aanvraag en status</p>
-
-        <div class="status-card" id="statusCard">
-          <div class="status-header">
-            <h2>Stand van zaken</h2>
-            <span class="status-badge" id="statusBadge">Geen aanvraag</span>
-          </div>
-          <div class="timeline" id="timeline">
-            <div class="timeline-step" data-step="ingediend">
-              <div class="step-dot"></div>
-              <div class="step-label">Aanvraag ingediend</div>
-            </div>
-            <div class="timeline-step" data-step="verwerkt">
-              <div class="step-dot"></div>
-              <div class="step-label">In behandeling</div>
-            </div>
-            <div class="timeline-step" data-step="afgerond">
-              <div class="step-dot"></div>
-              <div class="step-label">Afgerond</div>
-            </div>
-          </div>
-          <div class="status-details" id="statusDetails">
-            <p>Je hebt nog geen aanvraag ingediend. Start hieronder een nieuwe aanvraag.</p>
-          </div>
-        </div>
-
-        <div class="cards-grid">
-          <div class="card">
-            <h3>Pijler 1</h3>
-            <p class="card-title">Milieuvriendelijke bedrijfswagen</p>
-            <p class="card-desc">Elektrische of zero-emissie wagen (vanaf 2026 uitsluitend zero-emissie)</p>
-            <div class="card-amount" id="p1Amount">—</div>
-          </div>
-          <div class="card">
-            <h3>Pijler 2</h3>
-            <p class="card-title">Duurzame mobiliteit & huisvesting</p>
-            <p class="card-desc">Fiets, OV, deelmobiliteit, huur/hypotheek (max. 10 km van werk)</p>
-            <div class="card-amount" id="p2Amount">—</div>
-          </div>
-          <div class="card">
-            <h3>Pijler 3</h3>
-            <p class="card-title">Cash saldo</p>
-            <p class="card-desc">Restbedrag na pijler 1 & 2 (bijdrage 38,07%)</p>
-            <div class="card-amount" id="p3Amount">—</div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="btn btn-primary" onclick="showPage('aanvraag')">Nieuwe of wijzig aanvraag</button>
-          <button class="btn btn-secondary" onclick="showPage('info')">Bekijk informatietablad</button>
-        </div>
+      <div class="sidebar-footer">
+        <span class="env-badge">Demo · LogiMove</span>
       </div>
-    </section>
+    </aside>
 
-    <!-- AANVRAAG -->
-    <section id="page-aanvraag" class="page">
-      <div class="container">
-        <h1>Aanvraag mobiliteitsbudget</h1>
-        <p class="subtitle">Vul je persoonlijke gegevens in en kies hoe je het budget over de drie pijlers wilt verdelen.</p>
-
-        <form id="aanvraagForm" class="form">
-          <h3 class="form-section-title">Persoonlijke gegevens</h3>
-          <div class="form-row">
-            <div class="form-group">
-              <label for="voornaam">Voornaam *</label>
-              <input type="text" id="voornaam" required placeholder="Jan" />
-            </div>
-            <div class="form-group">
-              <label for="achternaam">Achternaam *</label>
-              <input type="text" id="achternaam" required placeholder="Peeters" />
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="personeelsnummer">Personeelsnummer *</label>
-              <input type="text" id="personeelsnummer" required placeholder="bv. 12345" />
-            </div>
-            <div class="form-group">
-              <label for="email">E-mailadres *</label>
-              <input type="email" id="email" required placeholder="jan.peeters@bedrijf.be" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="afdeling">Afdeling / Team</label>
-            <input type="text" id="afdeling" placeholder="bv. Logistiek, HR, Sales..." />
-          </div>
-
-          <h3 class="form-section-title">Budgetverdeling</h3>
-
-          <div class="form-group">
-            <label for="jaarBudget">Jaarlijks mobiliteitsbudget (€) *</label>
-            <input type="number" id="jaarBudget" min="3233" max="17244" step="1" value="10000" required />
-            <small>Minimum 2026: € 3.233 – Maximum: € 17.244 of 20% van brutojaarloon</small>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="p1">Pijler 1 – Bedrijfswagen (€)</label>
-              <input type="number" id="p1" min="0" step="1" value="0" />
-            </div>
-            <div class="form-group">
-              <label for="p2">Pijler 2 – Duurzame mobiliteit (€)</label>
-              <input type="number" id="p2" min="0" step="1" value="0" />
-            </div>
-            <div class="form-group">
-              <label for="p3">Pijler 3 – Cash saldo (€)</label>
-              <input type="number" id="p3" min="0" step="1" value="0" readonly />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="opmerkingen">Opmerkingen / motivatie</label>
-            <textarea id="opmerkingen" rows="3" placeholder="Optioneel: leg uit waarom je voor deze verdeling kiest..."></textarea>
-          </div>
-
-          <div class="form-group">
-            <label>
-              <input type="checkbox" id="akkoord" required />
-              Ik bevestig dat de ingevulde gegevens correct zijn en dat mijn aanvraag schriftelijk deel uitmaakt van de arbeidsovereenkomst.
-            </label>
-          </div>
-
-          <div class="form-actions">
-            <button type="submit" class="btn btn-primary">Aanvraag indienen / wijzigen</button>
-            <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
-          </div>
-        </form>
-
-        <div id="formFeedback" class="feedback hidden"></div>
-      </div>
-    </section>
-
-    <!-- INFO -->
-    <section id="page-info" class="page">
-      <div class="container">
-        <h1>Informatietablad Mobiliteitsbudget</h1>
-        <p class="subtitle">Wetgeving, voorwaarden en belangrijke data (situatie 2026)</p>
-
-        <div class="info-grid">
-          <article class="info-card">
-            <h2>Wat is het mobiliteitsbudget?</h2>
-            <p>Het mobiliteitsbudget is een wettelijk systeem waarbij een werknemer zijn (recht op een) bedrijfswagen kan inruilen voor een jaarlijks budget. Dat budget mag verdeeld worden over drie pijlers.</p>
-          </article>
-
-          <article class="info-card">
-            <h2>De drie pijlers</h2>
-            <ul>
-              <li><strong>Pijler 1</strong> – Milieuvriendelijke bedrijfswagen (vanaf 2026 uitsluitend zero-emissie / elektrische wagen).</li>
-              <li><strong>Pijler 2</strong> – Duurzame vervoermiddelen (fiets, e-bike, OV, deelmobiliteit, …) en bepaalde huisvestingskosten (woning max. 10 km vogelvlucht van de normale werkplek).</li>
-              <li><strong>Pijler 3</strong> – Restsaldo dat cash wordt uitbetaald (één keer per jaar). Er geldt een bijzondere werknemersbijdrage van <strong>38,07%</strong>.</li>
-            </ul>
-          </article>
-
-          <article class="info-card">
-            <h2>Bedragen 2026</h2>
-            <ul>
-              <li>Minimum: <strong>€ 3.233</strong> per kalenderjaar</li>
-              <li>Absoluut maximum: <strong>€ 17.244</strong> per kalenderjaar</li>
-              <li>Persoonlijk maximum: max. 20% van het totale brutojaarloon</li>
-            </ul>
-            <p>Het budget wordt berekend op basis van de Total Cost of Ownership (TCO) van de (in te ruilen) bedrijfswagen.</p>
-          </article>
-
-          <article class="info-card">
-            <h2>Wanneer kom je in aanmerking?</h2>
-            <ul>
-              <li>Je hebt een bedrijfswagen of komt er volgens het bedrijfswagenbeleid voor in aanmerking.</li>
-              <li>De werkgever moet het systeem hebben ingevoerd (en zelf minstens 36 maanden bedrijfswagens ter beschikking hebben gesteld, tenzij de onderneming jonger is).</li>
-              <li>De aanvraag en de positieve beslissing van de werkgever gebeuren schriftelijk en maken deel uit van de arbeidsovereenkomst.</li>
-            </ul>
-          </article>
-
-          <article class="info-card">
-            <h2>Belangrijke data & termijnen</h2>
-            <ul>
-              <li>Vanaf 1 januari 2026: pijler 1 enkel nog zero-emissiewagens (besteld/geleased vanaf die datum).</li>
-              <li>Uitbetaling pijler 3: uiterlijk met het loon van de eerste maand van het volgende kalenderjaar.</li>
-              <li>Indexatie van de grensbedragen gebeurt jaarlijks op 1 januari.</li>
-            </ul>
-          </article>
-
-          <article class="info-card">
-            <h2>Wetgeving</h2>
-            <p>Wet van 17 maart 2019 betreffende de invoering van een mobiliteitsbudget (en latere wijzigingen). De werkgever bepaalt welke opties binnen pijler 2 aangeboden worden, binnen de wettelijke grenzen.</p>
-            <p class="note">Dit is een informatieve samenvatting. Raadpleeg steeds de officiële teksten of HR voor bindende informatie.</p>
-          </article>
+    <!-- MAIN -->
+    <div class="app-main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="page-title" id="pageTitle">Mijn dossier</h1>
         </div>
-      </div>
-    </section>
+        <div class="topbar-right">
+          <span class="topbar-hint">Werkplek: Kontich</span>
+        </div>
+      </header>
 
-    <!-- CHAT -->
-    <section id="page-chat" class="page">
-      <div class="container">
-        <h1>Flo – je assistent</h1>
-        <p class="subtitle">Stel je vraag over het mobiliteitsbudget. Kan ik je niet helpen, dan verwijs ik je door naar HR.</p>
-
-        <div class="chat-container">
-          <div class="chat-messages" id="chatMessages">
-            <div class="message bot">
-              <div class="message-avatar">Flo</div>
-              <div class="message-content">
-                Hallo! Ik ben Flo, je MoveFlow-assistent. Waarmee kan ik je helpen over het mobiliteitsbudget?<br><br>
-                Voorbeelden: <em>“Hoeveel bedraagt het mobiliteitsbudget in 2026?”</em> of <em>“Wat mag ik doen met pijler 2?”</em>
+      <div class="content">
+        <!-- DASHBOARD -->
+        <section id="page-dashboard" class="page active">
+          <div class="panel">
+            <div class="panel-head">
+              <h2>Stand van zaken</h2>
+              <span class="status-badge" id="statusBadge">Geen aanvraag</span>
+            </div>
+            <div class="timeline" id="timeline">
+              <div class="timeline-step" data-step="ingediend">
+                <div class="step-dot"></div>
+                <div class="step-label">Ingediend</div>
+              </div>
+              <div class="timeline-step" data-step="verwerkt">
+                <div class="step-dot"></div>
+                <div class="step-label">In behandeling</div>
+              </div>
+              <div class="timeline-step" data-step="afgerond">
+                <div class="step-dot"></div>
+                <div class="step-label">Afgerond</div>
               </div>
             </div>
+            <div class="status-details" id="statusDetails">
+              <p>Nog geen aanvraag. Start via Aanvraag in het menu.</p>
+            </div>
           </div>
-          <div class="chat-input-area">
-            <input type="text" id="chatInput" placeholder="Typ je vraag..." autocomplete="off" />
-            <button class="btn btn-primary" id="chatSend">Verstuur</button>
+
+          <div class="kpi-row">
+            <div class="kpi">
+              <span class="kpi-label">Pijler 1 · Wagen</span>
+              <span class="kpi-value" id="p1Amount">—</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi-label">Pijler 2 · Duurzaam / huisvesting</span>
+              <span class="kpi-value" id="p2Amount">—</span>
+            </div>
+            <div class="kpi">
+              <span class="kpi-label">Pijler 3 · Cash</span>
+              <span class="kpi-value" id="p3Amount">—</span>
+            </div>
           </div>
-          <div class="quick-questions">
-            <button class="chip" data-q="Hoeveel bedraagt het mobiliteitsbudget in 2026?">Budget 2026</button>
-            <button class="chip" data-q="Wat zijn de drie pijlers?">Drie pijlers</button>
-            <button class="chip" data-q="Wanneer kom ik in aanmerking?">Aanmerking</button>
-            <button class="chip" data-q="Wat is de bijdrage op pijler 3?">Bijdrage pijler 3</button>
-            <button class="chip" data-q="Kan ik huisvestingskosten betalen?">Huisvesting</button>
+
+          <div class="actions">
+            <button class="btn btn-primary" onclick="showPage('aanvraag')">Aanvraag openen</button>
+            <button class="btn btn-secondary" onclick="showPage('info')">Regels bekijken</button>
           </div>
-        </div>
+        </section>
+
+        <!-- AANVRAAG -->
+        <section id="page-aanvraag" class="page">
+          <form id="aanvraagForm" class="panel form-panel">
+            <div class="panel-head"><h2>Persoonlijke gegevens</h2></div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="voornaam">Voornaam *</label>
+                <input type="text" id="voornaam" placeholder="Jan" />
+                <span class="field-error" id="err-voornaam"></span>
+              </div>
+              <div class="form-group">
+                <label for="achternaam">Achternaam *</label>
+                <input type="text" id="achternaam" placeholder="Peeters" />
+                <span class="field-error" id="err-achternaam"></span>
+              </div>
+              <div class="form-group">
+                <label for="personeelsnummer">Personeelsnummer *</label>
+                <input type="text" id="personeelsnummer" placeholder="2101" />
+                <span class="field-error" id="err-personeelsnummer"></span>
+              </div>
+              <div class="form-group">
+                <label for="email">E-mail *</label>
+                <input type="email" id="email" placeholder="naam@logimove.be" />
+                <span class="field-error" id="err-email"></span>
+              </div>
+              <div class="form-group">
+                <label for="afdeling">Afdeling</label>
+                <input type="text" id="afdeling" placeholder="Marketing, Logistiek..." />
+              </div>
+              <div class="form-group full">
+                <label for="adres">Woonadres *</label>
+                <input type="text" id="adres" placeholder="Straat 12, 2550 Kontich" />
+                <span class="field-error" id="err-adres"></span>
+                <small>Bij huisvestingskosten (pijler 2): max. 10 km van Kontich</small>
+              </div>
+            </div>
+
+            <div class="panel-head" style="margin-top:1.25rem"><h2>Budgetverdeling</h2></div>
+
+            <div class="form-grid">
+              <div class="form-group full">
+                <label for="jaarBudget">Jaarlijks budget (€) *</label>
+                <input type="number" id="jaarBudget" min="3233" max="17244" step="1" value="10000" />
+                <span class="field-error" id="err-jaarBudget"></span>
+                <small>Min. € 3.233 – max. € 17.244 (2026)</small>
+              </div>
+              <div class="form-group">
+                <label for="p1">Pijler 1 – Wagen (€)</label>
+                <input type="number" id="p1" min="0" step="1" value="0" />
+              </div>
+              <div class="form-group">
+                <label for="p2">Pijler 2 – Duurzaam / huisvesting (€)</label>
+                <input type="number" id="p2" min="0" step="1" value="0" />
+              </div>
+              <div class="form-group">
+                <label for="p3">Pijler 3 – Cash (€)</label>
+                <input type="number" id="p3" min="0" step="1" value="0" readonly />
+              </div>
+              <div class="form-group full">
+                <label class="check-label">
+                  <input type="checkbox" id="huisvesting" />
+                  Ik gebruik (een deel van) pijler 2 voor huur / hypotheek
+                </label>
+                <span class="field-error" id="err-huisvesting"></span>
+              </div>
+              <div class="form-group full">
+                <label for="opmerkingen">Opmerkingen</label>
+                <textarea id="opmerkingen" rows="2" placeholder="Motivatie of toelichting..."></textarea>
+              </div>
+              <div class="form-group full">
+                <label class="check-label">
+                  <input type="checkbox" id="akkoord" />
+                  Gegevens zijn correct en maken deel uit van de arbeidsovereenkomst *
+                </label>
+                <span class="field-error" id="err-akkoord"></span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary">Indienen / bijwerken</button>
+              <button type="button" class="btn btn-secondary" onclick="resetForm()">Reset</button>
+            </div>
+            <div id="formFeedback" class="feedback hidden"></div>
+          </form>
+        </section>
+
+        <!-- INFO -->
+        <section id="page-info" class="page">
+          <div class="info-grid">
+            <article class="panel">
+              <h2>Wat is het mobiliteitsbudget?</h2>
+              <p>Wettelijk systeem waarbij een werknemer zijn (recht op een) bedrijfswagen kan inruilen voor een jaarlijks budget, verdeeld over drie pijlers.</p>
+            </article>
+            <article class="panel">
+              <h2>Drie pijlers</h2>
+              <ul>
+                <li><strong>Pijler 1</strong> – Zero-emissie bedrijfswagen (vanaf 2026).</li>
+                <li><strong>Pijler 2</strong> – Duurzame mobiliteit + huisvesting (woning max. 10 km van Kontich).</li>
+                <li><strong>Pijler 3</strong> – Cash-restsaldo (bijdrage 38,07%).</li>
+              </ul>
+            </article>
+            <article class="panel">
+              <h2>Bedragen 2026</h2>
+              <ul>
+                <li>Minimum: <strong>€ 3.233</strong></li>
+                <li>Maximum: <strong>€ 17.244</strong> of 20% brutojaarloon</li>
+              </ul>
+            </article>
+            <article class="panel">
+              <h2>Huisvesting</h2>
+              <p>Huur/hypotheek in pijler 2 alleen als de woning max. <strong>10 km vogelvlucht</strong> van de werkplek in Kontich ligt.</p>
+            </article>
+          </div>
+        </section>
+
+        <!-- CHAT -->
+        <section id="page-chat" class="page">
+          <div class="chat-container panel">
+            <div class="chat-messages" id="chatMessages">
+              <div class="message bot">
+                <div class="message-avatar">Flo</div>
+                <div class="message-content">
+                  Hallo! Ik ben Flo. Vraag me iets over het mobiliteitsbudget, of ik verwijs je door naar HR.
+                </div>
+              </div>
+            </div>
+            <div class="chat-input-area">
+              <input type="text" id="chatInput" placeholder="Typ je vraag..." autocomplete="off" />
+              <button class="btn btn-primary" id="chatSend">Verstuur</button>
+            </div>
+            <div class="quick-questions">
+              <button class="chip" data-q="Hoeveel bedraagt het mobiliteitsbudget in 2026?">Budget 2026</button>
+              <button class="chip" data-q="Wat zijn de drie pijlers?">Drie pijlers</button>
+              <button class="chip" data-q="Kan ik huisvestingskosten betalen?">Huisvesting</button>
+              <button class="chip" data-q="Wat is de bijdrage op pijler 3?">Bijdrage pijler 3</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- HR PROCESS MANAGER -->
+        <section id="page-hr" class="page">
+          <div class="hr-stats" id="hrStats">
+            <div class="hr-stat"><span class="hr-stat-num" id="statOpen">0</span><span class="hr-stat-label">Openstaand</span></div>
+            <div class="hr-stat"><span class="hr-stat-num" id="statBehandeling">0</span><span class="hr-stat-label">In behandeling</span></div>
+            <div class="hr-stat"><span class="hr-stat-num" id="statAfgerond">0</span><span class="hr-stat-label">Afgerond</span></div>
+            <div class="hr-stat"><span class="hr-stat-num" id="statTotaal">0</span><span class="hr-stat-label">Totaal</span></div>
+          </div>
+
+          <div class="hr-toolbar">
+            <div class="hr-filters">
+              <button class="filter-btn active" data-filter="all">Alle</button>
+              <button class="filter-btn" data-filter="ingediend">Openstaand</button>
+              <button class="filter-btn" data-filter="verwerkt">In behandeling</button>
+              <button class="filter-btn" data-filter="afgerond">Afgerond</button>
+            </div>
+            <button class="btn btn-secondary btn-sm" id="seedDemoBtn">Demo-data herladen</button>
+          </div>
+
+          <div class="hr-layout">
+            <div class="hr-table-wrap panel">
+              <table class="hr-table" id="hrTable">
+                <thead>
+                  <tr>
+                    <th>Naam</th>
+                    <th>Nr.</th>
+                    <th>Afdeling</th>
+                    <th>Budget</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="hrTableBody"></tbody>
+              </table>
+              <p class="hr-empty" id="hrEmpty">Geen aanvragen.</p>
+            </div>
+
+            <div class="hr-detail panel hidden" id="hrDetail">
+              <div class="hr-detail-header">
+                <h2 id="hrDetailTitle">Dossier</h2>
+                <button class="btn btn-secondary btn-sm" onclick="closeHrDetail()">Sluiten</button>
+              </div>
+              <div id="hrDetailBody"></div>
+              <div id="hrEditFeedback" class="feedback hidden" style="margin-top:0.75rem"></div>
+            </div>
+          </div>
+        </section>
       </div>
-    </section>
-
-    <!-- HR OVERZICHT -->
-    <section id="page-hr" class="page">
-      <div class="container">
-        <h1>HR-overzicht</h1>
-        <p class="subtitle">Alle ingediende aanvragen – bekijk, filter en wijzig de status</p>
-
-        <div class="hr-stats" id="hrStats">
-          <div class="hr-stat">
-            <span class="hr-stat-num" id="statOpen">0</span>
-            <span class="hr-stat-label">Openstaand</span>
-          </div>
-          <div class="hr-stat">
-            <span class="hr-stat-num" id="statBehandeling">0</span>
-            <span class="hr-stat-label">In behandeling</span>
-          </div>
-          <div class="hr-stat">
-            <span class="hr-stat-num" id="statAfgerond">0</span>
-            <span class="hr-stat-label">Afgerond</span>
-          </div>
-          <div class="hr-stat">
-            <span class="hr-stat-num" id="statTotaal">0</span>
-            <span class="hr-stat-label">Totaal</span>
-          </div>
-        </div>
-
-        <div class="hr-toolbar">
-          <div class="hr-filters">
-            <button class="filter-btn active" data-filter="all">Alle</button>
-            <button class="filter-btn" data-filter="ingediend">Openstaand</button>
-            <button class="filter-btn" data-filter="verwerkt">In behandeling</button>
-            <button class="filter-btn" data-filter="afgerond">Afgerond</button>
-          </div>
-          <button class="btn btn-secondary btn-sm" id="seedDemoBtn" title="Vul demo-aanvragen in">Demo-data laden</button>
-        </div>
-
-        <div class="hr-table-wrap">
-          <table class="hr-table" id="hrTable">
-            <thead>
-              <tr>
-                <th>Naam</th>
-                <th>Personeelsnr.</th>
-                <th>Afdeling</th>
-                <th>Budget</th>
-                <th>Ingediend</th>
-                <th>Status</th>
-                <th>Acties</th>
-              </tr>
-            </thead>
-            <tbody id="hrTableBody">
-              <!-- rows via JS -->
-            </tbody>
-          </table>
-          <p class="hr-empty" id="hrEmpty">Nog geen aanvragen. Werknemers dienen via "Aanvraag" in, of laad demo-data.</p>
-        </div>
-
-        <!-- Detail panel -->
-        <div class="hr-detail hidden" id="hrDetail">
-          <div class="hr-detail-header">
-            <h2 id="hrDetailTitle">Aanvraagdetails</h2>
-            <button class="btn btn-secondary btn-sm" onclick="closeHrDetail()">Sluiten</button>
-          </div>
-          <div class="hr-detail-body" id="hrDetailBody"></div>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <div class="container">
-      <p>MoveFlow · Demo voor intern gebruik · Gebaseerd op de Belgische wetgeving (situatie 2026)</p>
-      <p class="footer-note">Bij twijfel of specifieke situaties: neem rechtstreeks contact op met HR.</p>
     </div>
-  </footer>
+  </div>
 
   <script src="app.js"></script>
 </body>
