@@ -338,8 +338,9 @@ function renderDashboard(){
   tbody.innerHTML=myApps.map(function(a){
     var st=statusMap[a.status]||statusMap.ingediend;
     var d=a.submittedAt?new Date(a.submittedAt).toLocaleDateString('nl-BE'):'-';
-    var item=a.item||'';
-    return '<tr><td>'+escapeHtml(d)+(item?'<br><small>'+escapeHtml(item)+'</small>':'')+'</td><td>EUR '+Number(a.jaarBudget||0).toLocaleString('nl-BE')+'</td><td>EUR '+Number(a.p1||0).toLocaleString('nl-BE')+'</td><td>EUR '+Number(a.p2||0).toLocaleString('nl-BE')+'</td><td>EUR '+Number(a.p3||0).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+st.class+'">'+st.label+'</span></td></tr>';
+    var item=a.item||'Aanvraag';
+    var statusLabel = a.status==='afgerond' ? 'Afgehandeld' : (a.status==='verwerkt' ? 'In behandeling' : 'Lopend');
+    return '<tr><td><strong>'+escapeHtml(item)+'</strong><br><small>'+escapeHtml(d)+'</small></td><td>EUR '+Number((a.p1||0)+(a.p2||0)+(a.p3||0)).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+st.class+'">'+statusLabel+'</span></td></tr>';
   }).join('');
 
   // Budget bar (sums all applications for this employee)
@@ -477,9 +478,9 @@ document.querySelectorAll('.filter-btn').forEach(function(btn){
 });
 
 var DEMO_APPLICATIONS=[
-  {id:'demo_elena_fiets',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8299,p1:0,p2:1200,p3:0,huisvesting:false,opmerkingen:'Leasefiets (€1.200).',status:'verwerkt',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-05T10:00:00',item:'Leasefiets'},
+  {id:'demo_elena_fiets',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8299,p1:0,p2:1200,p3:0,huisvesting:false,opmerkingen:'Leasefiets (€1.200).',status:'afgerond',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-05T10:00:00',item:'Leasefiets'},
   {id:'demo_elena_ov',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8299,p1:0,p2:499,p3:0,huisvesting:false,opmerkingen:'Openbaar vervoer (€499).',status:'verwerkt',submittedAt:'2026-11-02T09:00:00',lastUpdate:'2026-11-06T10:00:00',item:'Openbaar vervoer'},
-  {id:'demo_elena_huur',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8299,p1:0,p2:5000,p3:0,huisvesting:true,opmerkingen:'Huurkosten (€5.000). Resterend budget €1.600 kan eventueel via pijler 3 worden uitbetaald.',status:'verwerkt',submittedAt:'2026-11-03T09:00:00',lastUpdate:'2026-11-07T10:00:00',item:'Huurkosten'},
+  {id:'demo_elena_huur',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8299,p1:0,p2:5000,p3:0,huisvesting:true,opmerkingen:'Huurkosten (€5.000). Resterend budget €1.600 kan eventueel via pijler 3 worden uitbetaald.',status:'ingediend',submittedAt:'2026-11-03T09:00:00',lastUpdate:'2026-11-07T10:00:00',item:'Huurkosten'},
   {id:'demo_tom',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:9000,p1:0,p2:6500,p3:2500,huisvesting:false,opmerkingen:'Geen bedrijfswagen. Deelautos + OV.',status:'ingediend',submittedAt:'2026-11-08T10:15:00',lastUpdate:'2026-11-08T10:15:00'},
   {id:'demo_riadh',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Statiestraat 42, 2630 Aartselaar',jaarBudget:14500,p1:12000,p2:1500,p3:1000,huisvesting:false,opmerkingen:'Wil bedrijfswagen behouden (pijler 1).',status:'verwerkt',submittedAt:'2026-10-20T09:00:00',lastUpdate:'2026-11-03T14:20:00'}
 ];
