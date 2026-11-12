@@ -14,14 +14,16 @@ const DEMO_USERS = {
   'elena@logimove.be': { 
     password:'elena', role:'werknemer', name:'Elena Janssens', personeelsnummer:'2111',
     sap: {
-      voornaam:'Elena', achternaam:'Janssens', email:'elena@logimove.be', afdeling:'Logistiek',
+      voornaam:'Elena', achternaam:'Janssens', email:'elena@logimove.be', afdeling:'Administratief bediende',
       adres:'Kerkstraat 45, 2650 Edegem', leeftijd:31, thuiswerk:'woensdag',
       ancienniteit:'9 jaar', voltijds:true, rechtBedrijfswagen:true,
       gebruik:'Leasefiets + openbaar vervoer', totaalTCO:8400
     }
   },
-  'tom@logimove.be': { password:'tom', role:'werknemer', name:'Tom Willems', personeelsnummer:'2101' },
-  'riadh@logimove.be': { password:'riadh', role:'werknemer', name:'Riadh Man\u00e9', personeelsnummer:'2102' }
+  'tom@logimove.be': { password:'tom', role:'werknemer', name:'Tom Willems', personeelsnummer:'2101',
+    sap: { voornaam:'Tom', achternaam:'Willems', email:'tom@logimove.be', afdeling:'Marketing', adres:'Molenstraat 18, 2840 Rumst', totaalTCO:9000 } },
+  'riadh@logimove.be': { password:'riadh', role:'werknemer', name:'Riadh Man\u00e9', personeelsnummer:'2102',
+    sap: { voornaam:'Riadh', achternaam:'Man\u00e9', email:'riadh@logimove.be', afdeling:'Accountancy', adres:'Statiestraat 42, 2630 Aartselaar', totaalTCO:14500 } }
 };
 
 function getRole(){ return sessionStorage.getItem(ROLE_KEY) || null; }
@@ -185,33 +187,12 @@ function validateApplication(data, opts){
   if (!data.adres||data.adres.trim().length<8) errors.adres='Vul een volledig woonadres in.';
   var total=Number(data.jaarBudget);
   if (!total||total<3233||total>17244) errors.jaarBudget='Budget moet tussen 3233 en 17244 liggen.';
-  var p1=Number(data.p1)||0, p2=Number(data.p2)||0, p3=Number(data.p3)||0;
-  if (p1+p2+p3!==total) errors.jaarBudget=(errors.jaarBudget?errors.jaarBudget+' ':'')+'Som van de pijlers moet gelijk zijn aan het totaal.';
-  if (data.huisvesting){
-    if (p2<=0) errors.huisvesting='Bij huisvesting moet pijler 2 > 0 zijn.';
-    if (!isInKontichZone(data.adres)){
-      errors.adres='Voor huisvesting moet het adres binnen 10 km van Kontich liggen.';
-      errors.huisvesting='Adres ligt buiten de toegelaten zone rond Kontich.';
-    }
-  }
   if (requireAkkoord && !data.akkoord) errors.akkoord='Bevestiging is verplicht.';
   return errors;
 }
 
 var form=document.getElementById('aanvraagForm');
-var p1Input=document.getElementById('p1');
-var p2Input=document.getElementById('p2');
-var p3Input=document.getElementById('p3');
 var jaarInput=document.getElementById('jaarBudget');
-
-function updateP3(){
-  if (!jaarInput||!p1Input||!p2Input||!p3Input) return;
-  var total=Number(jaarInput.value)||0;
-  p3Input.value=Math.max(0, total-(Number(p1Input.value)||0)-(Number(p2Input.value)||0));
-}
-if (jaarInput&&p1Input&&p2Input){
-  [jaarInput,p1Input,p2Input].forEach(function(el){ el.addEventListener('input', updateP3); });
-}
 
 function prefillForm(){
   var key=getCurrentUserKey();
@@ -226,27 +207,21 @@ function prefillForm(){
   document.getElementById('achternaam').value=(data&&data.achternaam)||(sap&&sap.achternaam)||'';
   document.getElementById('personeelsnummer').value=key||'';
   document.getElementById('email').value=(data&&data.email)||(sap&&sap.email)||email||'';
-  document.getElementById('afdeling').value=(data&&data.afdeling)||(sap&&sap.afdeling)||'';
+  document.getElementById('afdeling').value=(sap&&sap.afdeling)||(data&&data.afdeling)||'';
   document.getElementById('adres').value=(data&&data.adres)||(sap&&sap.adres)||'';
-  if (data){
-    jaarInput.value=data.jaarBudget||10000;
-    p1Input.value=data.p1||0;
-    p2Input.value=data.p2||0;
-    document.getElementById('huisvesting').checked=!!data.huisvesting;
-    document.getElementById('opmerkingen').value=data.opmerkingen||'';
-  } else if (sap && sap.totaalTCO){
+  if (sap && sap.totaalTCO){
     jaarInput.value=sap.totaalTCO;
-    p1Input.value=0;
-    p2Input.value=0;
+  } else if (data && data.jaarBudget){
+    jaarInput.value=data.jaarBudget;
   }
-  updateP3();
+  document.getElementById('opmerkingen').value='';
 }
 
 function resetForm(){
   if (!form) return;
   form.reset();
-  jaarInput.value=10000; p1Input.value=0; p2Input.value=0;
-  updateP3(); clearErrors();
+  prefillForm();
+  clearErrors();
   var fb=document.getElementById('formFeedback');
   if (fb) fb.classList.add('hidden');
 }
@@ -263,10 +238,10 @@ if (form){
       afdeling:document.getElementById('afdeling').value.trim(),
       adres:document.getElementById('adres').value.trim(),
       jaarBudget:Number(jaarInput.value),
-      p1:Number(p1Input.value)||0,
-      p2:Number(p2Input.value)||0,
-      p3:Number(p3Input.value)||0,
-      huisvesting:document.getElementById('huisvesting').checked,
+      p1:0,
+      p2:0,
+      p3:0,
+      huisvesting:false,
       opmerkingen:document.getElementById('opmerkingen').value.trim(),
       akkoord:document.getElementById('akkoord').checked
     };
@@ -415,8 +390,8 @@ function showHrDetail(id){
   if (title) title.textContent=[app.voornaam,app.achternaam].filter(Boolean).join(' ') + (app.item?' – '+app.item:'');
   body.innerHTML='<form id="hrEditForm" class="hr-edit-grid" onsubmit="return saveHrEdit(event, \''+app.id+'\')"><div class="form-group"><label>Voornaam *</label><input type="text" id="hr-voornaam" value="'+escapeHtml(app.voornaam)+'" /><span class="field-error" id="err-hr-voornaam"></span></div><div class="form-group"><label>Achternaam *</label><input type="text" id="hr-achternaam" value="'+escapeHtml(app.achternaam)+'" /><span class="field-error" id="err-hr-achternaam"></span></div><div class="form-group"><label>Personeelsnr. *</label><input type="text" id="hr-personeelsnummer" value="'+escapeHtml(app.personeelsnummer)+'" /><span class="field-error" id="err-hr-personeelsnummer"></span></div><div class="form-group"><label>E-mail *</label><input type="email" id="hr-email" value="'+escapeHtml(app.email)+'" /><span class="field-error" id="err-hr-email"></span></div><div class="form-group"><label>Afdeling</label><input type="text" id="hr-afdeling" value="'+escapeHtml(app.afdeling||'')+'" /></div><div class="form-group full"><label>Woonadres *</label><input type="text" id="hr-adres" value="'+escapeHtml(app.adres||'')+'" /><span class="field-error" id="err-hr-adres"></span></div><div class="form-group"><label>Budget</label><input type="number" id="hr-jaarBudget" value="'+app.jaarBudget+'" /><span class="field-error" id="err-hr-jaarBudget"></span></div><div class="form-group"><label>Pijler 1</label><input type="number" id="hr-p1" value="'+app.p1+'" /></div><div class="form-group"><label>Pijler 2</label><input type="number" id="hr-p2" value="'+app.p2+'" /></div><div class="form-group"><label>Pijler 3</label><input type="number" id="hr-p3" value="'+app.p3+'" readonly /></div><div class="form-group full"><label class="check-label"><input type="checkbox" id="hr-huisvesting"'+(app.huisvesting?' checked':'')+' /> Huisvesting in pijler 2</label><span class="field-error" id="err-hr-huisvesting"></span></div><div class="form-group full"><label>Opmerkingen</label><textarea id="hr-opmerkingen" rows="2">'+escapeHtml(app.opmerkingen||'')+'</textarea></div><div class="form-group full form-actions"><button type="submit" class="btn btn-primary btn-sm">Wijzigingen opslaan</button></div></form>';
   var hp1=document.getElementById('hr-p1'), hp2=document.getElementById('hr-p2'), hp3=document.getElementById('hr-p3'), hj=document.getElementById('hr-jaarBudget');
-  function sync(){ hp3.value=Math.max(0,(Number(hj.value)||0)-(Number(hp1.value)||0)-(Number(hp2.value)||0)); }
-  [hp1,hp2,hj].forEach(function(el){ el.addEventListener('input', sync); });
+  function sync(){ if(hp3) hp3.value=Math.max(0,(Number(hj.value)||0)-(Number(hp1.value)||0)-(Number(hp2.value)||0)); }
+  [hp1,hp2,hj].forEach(function(el){ if(el) el.addEventListener('input', sync); });
   if (panel) panel.classList.remove('hidden');
   renderHrOverview();
 }
@@ -475,16 +450,15 @@ document.querySelectorAll('.filter-btn').forEach(function(btn){
 });
 
 var DEMO_APPLICATIONS=[
-  {id:'demo_elena_fiets',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:1200,p3:0,huisvesting:false,opmerkingen:'Leasefiets.',status:'afgerond',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-05T10:00:00',item:'Leasefiets'},
-  {id:'demo_elena_ov',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'Openbaar vervoer.',status:'verwerkt',submittedAt:'2026-11-02T09:00:00',lastUpdate:'2026-11-06T10:00:00',item:'Openbaar vervoer'},
-  {id:'demo_elena_huur',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:5000,p3:0,huisvesting:true,opmerkingen:'Huurkosten.',status:'ingediend',submittedAt:'2026-11-03T09:00:00',lastUpdate:'2026-11-07T10:00:00',item:'Huurkosten'},
-  {id:'demo_tom',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:9000,p1:0,p2:6500,p3:2500,huisvesting:false,opmerkingen:'Geen bedrijfswagen. Deelautos + OV.',status:'ingediend',submittedAt:'2026-11-08T10:15:00',lastUpdate:'2026-11-08T10:15:00'},
-  {id:'demo_riadh',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Statiestraat 42, 2630 Aartselaar',jaarBudget:14500,p1:12000,p2:1500,p3:1000,huisvesting:false,opmerkingen:'Wil bedrijfswagen behouden (pijler 1).',status:'verwerkt',submittedAt:'2026-10-20T09:00:00',lastUpdate:'2026-11-03T14:20:00'}
+  {id:'demo_elena_fiets',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:1200,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-05T10:00:00',item:'Leasefiets'},
+  {id:'demo_elena_ov',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'',status:'verwerkt',submittedAt:'2026-11-02T09:00:00',lastUpdate:'2026-11-06T10:00:00',item:'Openbaar vervoer'},
+  {id:'demo_elena_huur',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:5000,p3:0,huisvesting:true,opmerkingen:'',status:'ingediend',submittedAt:'2026-11-03T09:00:00',lastUpdate:'2026-11-07T10:00:00',item:'Huurkosten'},
+  {id:'demo_tom',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:9000,p1:0,p2:6500,p3:2500,huisvesting:false,opmerkingen:'',status:'ingediend',submittedAt:'2026-11-08T10:15:00',lastUpdate:'2026-11-08T10:15:00'},
+  {id:'demo_riadh',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Statiestraat 42, 2630 Aartselaar',jaarBudget:14500,p1:12000,p2:1500,p3:1000,huisvesting:false,opmerkingen:'',status:'verwerkt',submittedAt:'2026-10-20T09:00:00',lastUpdate:'2026-11-03T14:20:00'}
 ];
 
 function seedDemoData(){
   var list = loadAll();
-  // Remove any old Elena records that are not in the current demo set
   var demoIds = DEMO_APPLICATIONS.map(function(d){ return d.id; });
   list = list.filter(function(a){
     if (a.personeelsnummer === '2111' && demoIds.indexOf(a.id) === -1) return false;
@@ -512,7 +486,6 @@ if (seedBtn){
     if (getRole() === 'werknemer') renderDashboard();
   });
 }
-// Ensure demo records (incl. Elena) are always present
 seedDemoData();
 
 var faq=[
@@ -567,8 +540,6 @@ document.querySelectorAll('.chip').forEach(function(chip){
     handleChat();
   });
 });
-
-updateP3();
 
 var loginForm=document.getElementById('loginForm');
 var btnLogout=document.getElementById('logoutBtn');
