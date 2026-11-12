@@ -217,7 +217,7 @@ function prefillForm(){
     jaarInput.value=data.jaarBudget;
   }
   document.getElementById('opmerkingen').value='';
-  document.querySelectorAll('input[name="typeAanvraag"]').forEach(function(r){ r.checked=false; });
+  var sel=document.getElementById('typeAanvraag'); if(sel) sel.value='';
 }
 
 function resetForm(){
@@ -245,7 +245,7 @@ if (form){
       p2:0,
       p3:0,
       huisvesting:false,
-      typeAanvraag:(document.querySelector('input[name="typeAanvraag"]:checked')||{}).value||'',
+      typeAanvraag:document.getElementById('typeAanvraag')?.value||'',
       opmerkingen:document.getElementById('opmerkingen').value.trim(),
       akkoord:document.getElementById('akkoord').checked
     };
