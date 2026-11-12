@@ -319,7 +319,7 @@ function renderDashboard(){
     var d=a.submittedAt?new Date(a.submittedAt).toLocaleDateString('nl-BE'):'-';
     var item=a.typeAanvraag||a.item||'Aanvraag';
     var statusLabel = a.status==='afgerond' ? 'Afgehandeld' : (a.status==='verwerkt' ? 'In behandeling' : 'Lopend');
-    return '<tr><td>'+escapeHtml(d)+'</td><td><strong>'+escapeHtml(item)+'</strong></td><td>EUR '+Number((a.p1||0)+(a.p2)||0)+(a.p3||0)).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+st.class+'">'+statusLabel+'</span></td></tr>';
+    return '<tr><td>'+escapeHtml(d)+'</td><td><strong>'+escapeHtml(item)+'</strong></td><td>EUR '+Number((a.p1||0)+(a.p2||0)+(a.p3||0)).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+st.class+'">'+statusLabel+'</span></td></tr>';
   }).join('');
 
   var barContainer=document.getElementById('budgetBarContainer');
@@ -601,16 +601,21 @@ document.querySelectorAll('.chip').forEach(function(chip){
   });
 });
 
-var loginForm=document.getElementById('loginForm');
-var btnLogout=document.getElementById('logoutBtn');
-if (loginForm){
-  loginForm.addEventListener('submit', function(e){
-    e.preventDefault();
-    var email=document.getElementById('loginEmail');
-    var pass=document.getElementById('loginPassword');
-    tryLogin(email?email.value:'', pass?pass.value:'');
-  });
+try {
+  var loginForm=document.getElementById('loginForm');
+  var btnLogout=document.getElementById('logoutBtn');
+  if (loginForm){
+    loginForm.addEventListener('submit', function(e){
+      e.preventDefault();
+      var email=document.getElementById('loginEmail');
+      var pass=document.getElementById('loginPassword');
+      tryLogin(email?email.value:'', pass?pass.value:'');
+    });
+  }
+  if (btnLogout) btnLogout.addEventListener('click', logout);
+  applySession();
+} catch(err) {
+  console.error('Init error', err);
+  var ls=document.getElementById('loginScreen');
+  if (ls) ls.classList.remove('hidden');
 }
-if (btnLogout) btnLogout.addEventListener('click', logout);
-
-applySession();
