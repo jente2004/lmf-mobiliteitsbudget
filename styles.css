@@ -58,7 +58,6 @@ body.app-body {
 .sidebar-nav {
   display: flex;
   flex-direction: column;
-  inter-gap: 0.25rem;
   gap: 0.25rem;
   flex: 1;
 }
@@ -99,6 +98,11 @@ body.app-body {
   border-bottom: 1px solid var(--border);
 }
 .page-title { font-size: 1.1rem; font-weight: 700; color: var(--maroon); margin: 0; }
+.topbar-user {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--maroon);
+}
 .topbar-right {
   display: flex;
   align-items: center;
