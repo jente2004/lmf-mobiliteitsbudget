@@ -322,7 +322,6 @@ function renderDashboard(){
     return '<tr><td>'+escapeHtml(d)+'</td><td><strong>'+escapeHtml(item)+'</strong></td><td>EUR '+Number((a.p1||0)+(a.p2||0)+(a.p3||0)).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+st.class+'">'+statusLabel+'</span></td></tr>';
   }).join('');
 
-  // Budget bar (sums all applications for this employee)
   var barContainer=document.getElementById('budgetBarContainer');
   if (barContainer && myApps.length){
     var total = Number(myApps[0].jaarBudget) || 0;
@@ -499,11 +498,11 @@ function loadFloMessages(){
 function saveFloMessages(list){ localStorage.setItem(FLO_MESSAGES_KEY, JSON.stringify(list)); }
 
 var DEMO_FLO_MESSAGES = [
-  {id:'flo_elena_fiets', appId:'demo_elena_fiets', type:'goedgekeurd', text:'Goedgekeurd: Leasefiets (€1.200). Betaling: €100/maand gedurende 12 maanden, startend in december 2026.', date:'2026-11-05T10:30:00'},
-  {id:'flo_elena_ov', appId:'demo_elena_ov', type:'info', text:'Openbaar vervoer (€600): we hebben nog een kopie van je abonnement nodig. Stuur dit door naar HR.', date:'2026-11-06T11:00:00'},
+  {id:'flo_elena_fiets', appId:'demo_elena_fiets', type:'goedgekeurd', text:'Goedgekeurd: Leasefiets (€1.200). Betaling: €100/maand gedurende 12 maanden, startend in december 2026.', date:'2026-11-05T10:30:00', replies:[{from:'user',text:'Bedankt, dat is duidelijk.'}]},
+  {id:'flo_elena_ov', appId:'demo_elena_ov', type:'info', text:'Openbaar vervoer (€600): we hebben nog een kopie van je abonnement nodig. Stuur dit door naar HR.', date:'2026-11-06T11:00:00', replies:[{from:'user',text:'Ik stuur het abonnement door.'}]},
   {id:'flo_elena_huur', appId:'demo_elena_huur', type:'info', text:'Huurkosten (€5.000): ontbrekende stukken. Voeg je huurcontract toe vooraleer we verder kunnen.', date:'2026-11-07T14:00:00'},
   {id:'flo_tom', appId:'demo_tom', type:'afgewezen', text:'Aanvraag Tom Willems afgewezen. Reden: deelauto-gebruik past niet binnen de huidige pijler 2-richtlijnen. Contacteer HR voor alternatieven.', date:'2026-11-09T09:00:00'},
-  {id:'flo_riadh', appId:'demo_riadh', type:'goedgekeurd', text:'Goedgekeurd: Bedrijfswagen (pijler 1, €12.000). Betaling via loon vanaf januari 2027.', date:'2026-11-04T15:00:00'}
+  {id:'flo_riadh', appId:'demo_riadh', type:'goedgekeurd', text:'Goedgekeurd: Bedrijfswagen (pijler 1, €12.000). Betaling via loon vanaf januari 2027.', date:'2026-11-04T15:00:00', replies:[{from:'user',text:'Oké, dank je.'}]}
 ];
 
 function seedFloMessages(){
@@ -514,6 +513,24 @@ function seedFloMessages(){
   saveFloMessages(list);
 }
 seedFloMessages();
+
+function openFloThread(msgId){
+  var msgs = loadFloMessages();
+  var m = msgs.find(function(x){ return x.id===msgId; });
+  if (!m) return;
+  var c = document.getElementById('chatMessages');
+  if (!c) return;
+  c.innerHTML = '';
+  addMessage(m.text, false);
+  if (m.replies){
+    m.replies.forEach(function(r){
+      addMessage(r.text, r.from==='user');
+    });
+  }
+  var input = document.getElementById('chatInput');
+  if (input) input.focus();
+  window.currentFloThread = msgId;
+}
 
 function renderFloHistory(){
   var container = document.getElementById('floHistory');
@@ -526,7 +543,7 @@ function renderFloHistory(){
   container.innerHTML = msgs.map(function(m){
     var label = m.type==='goedgekeurd'?'Goedgekeurd':(m.type==='afgewezen'?'Afgewezen':'Extra info nodig');
     var d = new Date(m.date).toLocaleString('nl-BE');
-    return '<div class="panel" style="margin-bottom:0.6rem;padding:0.7rem"><div style="font-size:0.75rem;color:var(--muted)">'+d+' · '+label+'</div><div style="margin-top:0.3rem">'+escapeHtml(m.text)+'</div></div>';
+    return '<div class="panel" style="margin-bottom:0.6rem;padding:0.7rem;cursor:pointer" onclick="openFloThread(\''+m.id+'\')"><div style="font-size:0.75rem;color:var(--muted)">'+d+' · '+label+'</div><div style="margin-top:0.3rem">'+escapeHtml(m.text)+'</div></div>';
   }).join('');
 }
 
