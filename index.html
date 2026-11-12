@@ -12,26 +12,25 @@
 <body class="app-body">
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="sidebar-brand" onclick="setMode('werknemer')">
+      <div class="sidebar-brand" onclick="showPage('dashboard')">
         <img src="logo.png" alt="MoveFlow" class="sidebar-logo" />
         <span class="sidebar-title">MoveFlow</span>
       </div>
 
-      <!-- Duidelijke moduskeuze -->
       <div class="mode-switch">
         <button type="button" class="mode-btn active" id="modeWerknemer" onclick="setMode('werknemer')">Werknemer</button>
         <button type="button" class="mode-btn" id="modeHr" onclick="setMode('hr')">HR</button>
       </div>
 
-      <nav class="sidebar-nav" id="navWerknemer">
+      <nav class="sidebar-nav" id="navAll">
+        <p class="nav-group">Werknemer</p>
         <button type="button" class="nav-item active" data-page="dashboard">Mijn dossier</button>
         <button type="button" class="nav-item" data-page="aanvraag">Aanvraag</button>
         <button type="button" class="nav-item" data-page="info">Info & regels</button>
         <button type="button" class="nav-item" data-page="chat">Flo assistent</button>
-      </nav>
 
-      <nav class="sidebar-nav hidden" id="navHr">
-        <button type="button" class="nav-item" data-page="hr">Process manager</button>
+        <p class="nav-group">HR</p>
+        <button type="button" class="nav-item nav-hr" data-page="hr">Process manager</button>
       </nav>
 
       <div class="sidebar-footer">
@@ -46,7 +45,6 @@
       </header>
 
       <div class="content">
-        <!-- DASHBOARD -->
         <section id="page-dashboard" class="page active">
           <div class="panel">
             <div class="panel-head">
@@ -72,10 +70,10 @@
           <div class="actions">
             <button type="button" class="btn btn-primary" onclick="showPage('aanvraag')">Aanvraag openen</button>
             <button type="button" class="btn btn-secondary" onclick="showPage('info')">Regels bekijken</button>
+            <button type="button" class="btn btn-secondary" onclick="showPage('chat')">Vraag aan Flo</button>
           </div>
         </section>
 
-        <!-- AANVRAAG -->
         <section id="page-aanvraag" class="page">
           <form id="aanvraagForm" class="panel form-panel">
             <div class="panel-head"><h2>Persoonlijke gegevens</h2></div>
@@ -153,7 +151,6 @@
           </form>
         </section>
 
-        <!-- INFO -->
         <section id="page-info" class="page">
           <div class="info-grid">
             <article class="panel"><h2>Mobiliteitsbudget</h2><p>Bedrijfswagen inruilen voor een jaarlijks budget over drie pijlers.</p></article>
@@ -163,7 +160,6 @@
           </div>
         </section>
 
-        <!-- CHAT / ASSISTENT -->
         <section id="page-chat" class="page">
           <div class="chat-container panel">
             <div class="chat-messages" id="chatMessages">
@@ -185,9 +181,8 @@
           </div>
         </section>
 
-        <!-- HR -->
         <section id="page-hr" class="page">
-          <p class="hr-intro">HR-modus: alle aanvragen beheren, status zetten en dossiers corrigeren.</p>
+          <p class="hr-intro">HR-modus: alle aanvragen van werknemers beheren, status zetten en dossiers corrigeren.</p>
           <div class="hr-stats">
             <div class="hr-stat"><span class="hr-stat-num" id="statOpen">0</span><span class="hr-stat-label">Openstaand</span></div>
             <div class="hr-stat"><span class="hr-stat-num" id="statBehandeling">0</span><span class="hr-stat-label">In behandeling</span></div>
