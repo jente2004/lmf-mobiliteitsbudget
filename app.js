@@ -360,6 +360,8 @@ function renderDashboard(){
     }
     if (data.p3>0){
       html+='<p style="margin:0.5rem 0 0;font-size:0.85rem"><strong>Pijler 3:</strong> EUR '+Number(data.p3).toLocaleString('nl-BE')+' uitbetalen op volgend loon.</p>';
+    } else if (remaining > 0){
+      html+='<p style="margin:0.5rem 0 0;font-size:0.85rem"><strong>Resterend:</strong> EUR '+remaining.toLocaleString('nl-BE')+' kan eventueel worden uitbetaald via pijler 3.</p>';
     }
     barContainer.innerHTML=html;
   } else if (barContainer){
@@ -475,7 +477,7 @@ document.querySelectorAll('.filter-btn').forEach(function(btn){
 });
 
 var DEMO_APPLICATIONS=[
-  {id:'demo_elena',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:6800,p3:1600,huisvesting:false,opmerkingen:'Leasefiets (€4500) + busabonnement (€2300). Resterend €1600 uitbetalen via pijler 3 op volgende loon.',status:'verwerkt',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-10T14:00:00',breakdown:[{item:'Fietslease',bedrag:4500,pijler:2},{item:'Busabonnement',bedrag:2300,pijler:2},{item:'Uitbetaling pijler 3 (volgend loon)',bedrag:1600,pijler:3}]},
+  {id:'demo_elena',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:6800,p3:0,huisvesting:false,opmerkingen:'Leasefiets (€1200) + busabonnement (€5600). Resterend €1600 kan eventueel worden uitbetaald via pijler 3.',status:'verwerkt',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-10T14:00:00',breakdown:[{item:'Fietslease',bedrag:1200,pijler:2},{item:'Busabonnement',bedrag:5600,pijler:2}]},
   {id:'demo_tom',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:9000,p1:0,p2:6500,p3:2500,huisvesting:false,opmerkingen:'Geen bedrijfswagen. Deelautos + OV.',status:'ingediend',submittedAt:'2026-11-08T10:15:00',lastUpdate:'2026-11-08T10:15:00'},
   {id:'demo_riadh',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Statiestraat 42, 2630 Aartselaar',jaarBudget:14500,p1:12000,p2:1500,p3:1000,huisvesting:false,opmerkingen:'Wil bedrijfswagen behouden (pijler 1).',status:'verwerkt',submittedAt:'2026-10-20T09:00:00',lastUpdate:'2026-11-03T14:20:00'}
 ];
