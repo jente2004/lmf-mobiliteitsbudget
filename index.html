@@ -12,7 +12,7 @@
 <body class="app-body">
   <div class="app-shell">
     <aside class="sidebar">
-      <div class="sidebar-brand" onclick="showPage('dashboard')">
+      <div class="sidebar-brand" onclick="setMode('werknemer')">
         <img src="logo.png" alt="MoveFlow" class="sidebar-logo" />
         <span class="sidebar-title">MoveFlow</span>
       </div>
@@ -22,15 +22,17 @@
         <button type="button" class="mode-btn" id="modeHr" onclick="setMode('hr')">HR</button>
       </div>
 
-      <nav class="sidebar-nav" id="navAll">
-        <p class="nav-group">Werknemer</p>
+      <!-- Alleen zichtbaar in werknemer-modus -->
+      <nav class="sidebar-nav" id="navWerknemer">
         <button type="button" class="nav-item active" data-page="dashboard">Mijn dossier</button>
         <button type="button" class="nav-item" data-page="aanvraag">Aanvraag</button>
         <button type="button" class="nav-item" data-page="info">Info & regels</button>
         <button type="button" class="nav-item" data-page="chat">Flo assistent</button>
+      </nav>
 
-        <p class="nav-group">HR</p>
-        <button type="button" class="nav-item nav-hr" data-page="hr">Process manager</button>
+      <!-- Alleen zichtbaar in HR-modus -->
+      <nav class="sidebar-nav hidden" id="navHr">
+        <button type="button" class="nav-item" data-page="hr">Process manager</button>
       </nav>
 
       <div class="sidebar-footer">
