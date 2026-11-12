@@ -326,6 +326,18 @@ h1 {
   margin-bottom: 1.25rem;
 }
 
+.form-section-title {
+  font-size: 1.05rem;
+  color: var(--maroon);
+  margin: 0 0 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-section-title:not(:first-child) {
+  margin-top: 1.5rem;
+}
+
 .form-group {
   margin-bottom: 1.25rem;
 }
@@ -339,6 +351,7 @@ h1 {
 
 .form-group input[type="number"],
 .form-group input[type="text"],
+.form-group input[type="email"],
 .form-group textarea {
   width: 100%;
   padding: 0.65rem 0.9rem;
