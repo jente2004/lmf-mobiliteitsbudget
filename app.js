@@ -19,39 +19,46 @@ const PAGE_TITLES = {
 };
 
 function setMode(mode) {
-  const isHr = mode === 'hr';
-  document.getElementById('modeWerknemer').classList.toggle('active', !isHr);
-  document.getElementById('modeHr').classList.toggle('active', isHr);
-  document.getElementById('navWerknemer').classList.toggle('hidden', isHr);
-  document.getElementById('navHr').classList.toggle('hidden', !isHr);
-  const badge = document.getElementById('modeBadge');
+  var isHr = mode === 'hr';
+  var mw = document.getElementById('modeWerknemer');
+  var mh = document.getElementById('modeHr');
+  if (mw) mw.classList.toggle('active', !isHr);
+  if (mh) mh.classList.toggle('active', isHr);
+  var badge = document.getElementById('modeBadge');
   if (badge) badge.textContent = isHr ? 'Modus: HR' : 'Modus: Werknemer';
   showPage(isHr ? 'hr' : 'dashboard');
 }
 
 function showPage(pageId) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  const page = document.getElementById('page-' + pageId);
+  document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(function(b) { b.classList.remove('active'); });
+  var page = document.getElementById('page-' + pageId);
   if (page) page.classList.add('active');
-  const btn = document.querySelector('.nav-item[data-page="' + pageId + '"]');
+  var btn = document.querySelector('.nav-item[data-page="' + pageId + '"]');
   if (btn) btn.classList.add('active');
-  const title = document.getElementById('pageTitle');
+  var title = document.getElementById('pageTitle');
   if (title) title.textContent = PAGE_TITLES[pageId] || 'MoveFlow';
+  var isHr = pageId === 'hr';
+  var mw = document.getElementById('modeWerknemer');
+  var mh = document.getElementById('modeHr');
+  if (mw) mw.classList.toggle('active', !isHr);
+  if (mh) mh.classList.toggle('active', isHr);
+  var badge = document.getElementById('modeBadge');
+  if (badge) badge.textContent = isHr ? 'Modus: HR' : 'Modus: Werknemer';
   if (pageId === 'dashboard') renderDashboard();
   if (pageId === 'aanvraag') prefillForm();
   if (pageId === 'hr') renderHrOverview();
 }
 
-document.querySelectorAll('.nav-item').forEach(btn => {
-  btn.addEventListener('click', () => showPage(btn.dataset.page));
+document.querySelectorAll('.nav-item').forEach(function(btn) {
+  btn.addEventListener('click', function() { showPage(btn.dataset.page); });
 });
 
 function loadAll() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    var raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
-  } catch { return []; }
+  } catch (e) { return []; }
 }
 
 function saveAll(list) {
@@ -67,14 +74,14 @@ function setCurrentUserKey(key) {
 }
 
 function findByPersoneelsnummer(nr) {
-  return loadAll().find(a => a.personeelsnummer === nr) || null;
+  return loadAll().find(function(a) { return a.personeelsnummer === nr; }) || null;
 }
 
 function upsertApplication(app) {
-  const list = loadAll();
-  const idx = list.findIndex(a => a.personeelsnummer === app.personeelsnummer);
+  var list = loadAll();
+  var idx = list.findIndex(function(a) { return a.personeelsnummer === app.personeelsnummer; });
   if (idx >= 0) {
-    const prev = list[idx];
+    var prev = list[idx];
     app.status = prev.status === 'afgerond' ? 'ingediend' : (prev.status || 'ingediend');
     app.id = prev.id;
     list[idx] = Object.assign({}, prev, app, { lastUpdate: new Date().toISOString() });
@@ -89,8 +96,8 @@ function upsertApplication(app) {
 }
 
 function updateStatus(id, newStatus) {
-  const list = loadAll();
-  const idx = list.findIndex(a => a.id === id);
+  var list = loadAll();
+  var idx = list.findIndex(function(a) { return a.id === id; });
   if (idx < 0) return;
   list[idx].status = newStatus;
   list[idx].lastUpdate = new Date().toISOString();
@@ -98,8 +105,8 @@ function updateStatus(id, newStatus) {
 }
 
 function updateApplicationById(id, fields) {
-  const list = loadAll();
-  const idx = list.findIndex(a => a.id === id);
+  var list = loadAll();
+  var idx = list.findIndex(function(a) { return a.id === id; });
   if (idx < 0) return false;
   list[idx] = Object.assign({}, list[idx], fields, { lastUpdate: new Date().toISOString() });
   saveAll(list);
@@ -107,13 +114,13 @@ function updateApplicationById(id, fields) {
 }
 
 function clearErrors() {
-  document.querySelectorAll('.field-error').forEach(el => { el.textContent = ''; });
-  document.querySelectorAll('input.invalid, textarea.invalid').forEach(el => el.classList.remove('invalid'));
+  document.querySelectorAll('.field-error').forEach(function(el) { el.textContent = ''; });
+  document.querySelectorAll('input.invalid, textarea.invalid').forEach(function(el) { el.classList.remove('invalid'); });
 }
 
 function setError(id, msg) {
-  const err = document.getElementById('err-' + id);
-  const input = document.getElementById(id);
+  var err = document.getElementById('err-' + id);
+  var input = document.getElementById(id);
   if (err) err.textContent = msg || '';
   if (input) {
     if (msg) input.classList.add('invalid');
@@ -123,24 +130,24 @@ function setError(id, msg) {
 
 function isInKontichZone(adres) {
   if (!adres) return false;
-  const lower = adres.toLowerCase();
-  return KONTICH_ZONE.some(g => lower.includes(g));
+  var lower = adres.toLowerCase();
+  return KONTICH_ZONE.some(function(g) { return lower.indexOf(g) !== -1; });
 }
 
 function validateApplication(data, opts) {
   opts = opts || {};
-  const requireAkkoord = opts.requireAkkoord !== false;
-  const errors = {};
+  var requireAkkoord = opts.requireAkkoord !== false;
+  var errors = {};
   if (!data.voornaam || data.voornaam.trim().length < 2) errors.voornaam = 'Voornaam is verplicht (min. 2 tekens).';
   if (!data.achternaam || data.achternaam.trim().length < 2) errors.achternaam = 'Achternaam is verplicht (min. 2 tekens).';
   if (!data.personeelsnummer || !/^\d{3,10}$/.test(data.personeelsnummer.trim())) errors.personeelsnummer = 'Geldig personeelsnummer vereist (alleen cijfers).';
   if (!data.email || !/^[^\s@]+@logimove\.be$/i.test(data.email.trim())) errors.email = 'Gebruik een @logimove.be e-mailadres.';
   if (!data.adres || data.adres.trim().length < 8) errors.adres = 'Vul een volledig woonadres in.';
-  const total = Number(data.jaarBudget);
+  var total = Number(data.jaarBudget);
   if (!total || total < 3233 || total > 17244) errors.jaarBudget = 'Budget moet tussen 3233 en 17244 liggen.';
-  const p1 = Number(data.p1) || 0;
-  const p2 = Number(data.p2) || 0;
-  const p3 = Number(data.p3) || 0;
+  var p1 = Number(data.p1) || 0;
+  var p2 = Number(data.p2) || 0;
+  var p3 = Number(data.p3) || 0;
   if (p1 + p2 + p3 !== total) errors.jaarBudget = (errors.jaarBudget ? errors.jaarBudget + ' ' : '') + 'Som van de pijlers moet gelijk zijn aan het totaal.';
   if (data.huisvesting) {
     if (p2 <= 0) errors.huisvesting = 'Bij huisvesting moet pijler 2 > 0 zijn.';
@@ -153,28 +160,28 @@ function validateApplication(data, opts) {
   return errors;
 }
 
-const form = document.getElementById('aanvraagForm');
-const p1Input = document.getElementById('p1');
-const p2Input = document.getElementById('p2');
-const p3Input = document.getElementById('p3');
-const jaarInput = document.getElementById('jaarBudget');
+var form = document.getElementById('aanvraagForm');
+var p1Input = document.getElementById('p1');
+var p2Input = document.getElementById('p2');
+var p3Input = document.getElementById('p3');
+var jaarInput = document.getElementById('jaarBudget');
 
 function updateP3() {
   if (!jaarInput || !p1Input || !p2Input || !p3Input) return;
-  const total = Number(jaarInput.value) || 0;
-  const p1 = Number(p1Input.value) || 0;
-  const p2 = Number(p2Input.value) || 0;
+  var total = Number(jaarInput.value) || 0;
+  var p1 = Number(p1Input.value) || 0;
+  var p2 = Number(p2Input.value) || 0;
   p3Input.value = Math.max(0, total - p1 - p2);
 }
 
 if (jaarInput && p1Input && p2Input) {
-  [jaarInput, p1Input, p2Input].forEach(el => el.addEventListener('input', updateP3));
+  [jaarInput, p1Input, p2Input].forEach(function(el) { el.addEventListener('input', updateP3); });
 }
 
 function prefillForm() {
-  const key = getCurrentUserKey();
+  var key = getCurrentUserKey();
   if (!key) return;
-  const data = findByPersoneelsnummer(key);
+  var data = findByPersoneelsnummer(key);
   if (!data) return;
   document.getElementById('voornaam').value = data.voornaam || '';
   document.getElementById('achternaam').value = data.achternaam || '';
@@ -204,7 +211,7 @@ if (form) {
   form.addEventListener('submit', function(e) {
     e.preventDefault();
     clearErrors();
-    const data = {
+    var data = {
       voornaam: document.getElementById('voornaam').value.trim(),
       achternaam: document.getElementById('achternaam').value.trim(),
       personeelsnummer: document.getElementById('personeelsnummer').value.trim(),
@@ -219,8 +226,8 @@ if (form) {
       opmerkingen: document.getElementById('opmerkingen').value.trim(),
       akkoord: document.getElementById('akkoord').checked
     };
-    const errors = validateApplication(data);
-    const feedback = document.getElementById('formFeedback');
+    var errors = validateApplication(data);
+    var feedback = document.getElementById('formFeedback');
     if (Object.keys(errors).length) {
       Object.keys(errors).forEach(function(k) { setError(k, errors[k]); });
       feedback.textContent = 'Controleer de gemarkeerde velden.';
@@ -239,11 +246,11 @@ if (form) {
 }
 
 function renderDashboard() {
-  const key = getCurrentUserKey();
-  const data = key ? findByPersoneelsnummer(key) : null;
-  const badge = document.getElementById('statusBadge');
-  const details = document.getElementById('statusDetails');
-  const steps = document.querySelectorAll('.timeline-step');
+  var key = getCurrentUserKey();
+  var data = key ? findByPersoneelsnummer(key) : null;
+  var badge = document.getElementById('statusBadge');
+  var details = document.getElementById('statusDetails');
+  var steps = document.querySelectorAll('.timeline-step');
   steps.forEach(function(s) { s.classList.remove('done', 'current'); });
   if (!data) {
     badge.textContent = 'Geen aanvraag';
@@ -257,24 +264,24 @@ function renderDashboard() {
   document.getElementById('p1Amount').textContent = 'EUR ' + data.p1.toLocaleString('nl-BE');
   document.getElementById('p2Amount').textContent = 'EUR ' + data.p2.toLocaleString('nl-BE');
   document.getElementById('p3Amount').textContent = 'EUR ' + data.p3.toLocaleString('nl-BE');
-  const statusMap = {
+  var statusMap = {
     ingediend: { label: 'Openstaand', class: 'ingediend' },
     verwerkt: { label: 'In behandeling', class: 'verwerkt' },
     afgerond: { label: 'Afgerond', class: 'afgerond' }
   };
-  const st = statusMap[data.status] || statusMap.ingediend;
+  var st = statusMap[data.status] || statusMap.ingediend;
   badge.textContent = st.label;
   badge.className = 'status-badge ' + st.class;
-  const order = ['ingediend', 'verwerkt', 'afgerond'];
-  const currentIdx = order.indexOf(data.status);
+  var order = ['ingediend', 'verwerkt', 'afgerond'];
+  var currentIdx = order.indexOf(data.status);
   order.forEach(function(step, idx) {
-    const el = document.querySelector('.timeline-step[data-step="' + step + '"]');
+    var el = document.querySelector('.timeline-step[data-step="' + step + '"]');
     if (!el) return;
     if (idx < currentIdx) el.classList.add('done');
     else if (idx === currentIdx) el.classList.add('current');
   });
-  const dateStr = new Date(data.submittedAt).toLocaleString('nl-BE');
-  const naam = [data.voornaam, data.achternaam].filter(Boolean).join(' ');
+  var dateStr = new Date(data.submittedAt).toLocaleString('nl-BE');
+  var naam = [data.voornaam, data.achternaam].filter(Boolean).join(' ');
   details.innerHTML = '<p><strong>' + escapeHtml(naam) + '</strong> · ' + escapeHtml(data.personeelsnummer) + '</p>' +
     '<p>' + escapeHtml(data.email) + ' · ' + escapeHtml(data.adres || '-') + '</p>' +
     '<p>Ingediend: ' + dateStr + ' · Budget: EUR ' + data.jaarBudget.toLocaleString('nl-BE') + '</p>';
@@ -284,18 +291,18 @@ function escapeHtml(str) {
   return String(str == null ? '' : str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
 }
 
-let hrFilter = 'all';
-let selectedHrId = null;
+var hrFilter = 'all';
+var selectedHrId = null;
 
 function renderHrOverview() {
-  const list = loadAll();
-  document.getElementById('statOpen').textContent = list.filter(a => a.status === 'ingediend').length;
-  document.getElementById('statBehandeling').textContent = list.filter(a => a.status === 'verwerkt').length;
-  document.getElementById('statAfgerond').textContent = list.filter(a => a.status === 'afgerond').length;
+  var list = loadAll();
+  document.getElementById('statOpen').textContent = list.filter(function(a) { return a.status === 'ingediend'; }).length;
+  document.getElementById('statBehandeling').textContent = list.filter(function(a) { return a.status === 'verwerkt'; }).length;
+  document.getElementById('statAfgerond').textContent = list.filter(function(a) { return a.status === 'afgerond'; }).length;
   document.getElementById('statTotaal').textContent = list.length;
-  const filtered = hrFilter === 'all' ? list.slice() : list.filter(a => a.status === hrFilter);
-  const tbody = document.getElementById('hrTableBody');
-  const empty = document.getElementById('hrEmpty');
+  var filtered = hrFilter === 'all' ? list.slice() : list.filter(function(a) { return a.status === hrFilter; });
+  var tbody = document.getElementById('hrTableBody');
+  var empty = document.getElementById('hrEmpty');
   if (!filtered.length) {
     tbody.innerHTML = '';
     empty.classList.remove('hidden');
@@ -304,7 +311,7 @@ function renderHrOverview() {
   empty.classList.add('hidden');
   filtered.sort(function(a, b) { return new Date(b.submittedAt) - new Date(a.submittedAt); });
   tbody.innerHTML = filtered.map(function(a) {
-    const naam = [a.voornaam, a.achternaam].filter(Boolean).join(' ');
+    var naam = [a.voornaam, a.achternaam].filter(Boolean).join(' ');
     return '<tr data-id="' + a.id + '" class="' + (selectedHrId === a.id ? 'selected' : '') + '" onclick="showHrDetail(\'' + a.id + '\')">' +
       '<td><strong>' + escapeHtml(naam) + '</strong></td>' +
       '<td>' + escapeHtml(a.personeelsnummer) + '</td>' +
@@ -325,13 +332,13 @@ function hrChangeStatus(id, status) {
 }
 
 function showHrDetail(id) {
-  const app = loadAll().find(a => a.id === id);
+  var app = loadAll().find(function(a) { return a.id === id; });
   if (!app) return;
   selectedHrId = id;
-  const panel = document.getElementById('hrDetail');
-  const body = document.getElementById('hrDetailBody');
-  const title = document.getElementById('hrDetailTitle');
-  const fb = document.getElementById('hrEditFeedback');
+  var panel = document.getElementById('hrDetail');
+  var body = document.getElementById('hrDetailBody');
+  var title = document.getElementById('hrDetailTitle');
+  var fb = document.getElementById('hrEditFeedback');
   fb.classList.add('hidden');
   title.textContent = [app.voornaam, app.achternaam].filter(Boolean).join(' ');
   body.innerHTML = '<form id="hrEditForm" class="hr-edit-grid" onsubmit="return saveHrEdit(event, \'' + app.id + '\')">' +
@@ -348,12 +355,12 @@ function showHrDetail(id) {
     '<div class="form-group full"><label class="check-label"><input type="checkbox" id="hr-huisvesting"' + (app.huisvesting ? ' checked' : '') + ' /> Huisvesting in pijler 2</label><span class="field-error" id="err-hr-huisvesting"></span></div>' +
     '<div class="form-group full"><label>Opmerkingen</label><textarea id="hr-opmerkingen" rows="2">' + escapeHtml(app.opmerkingen || '') + '</textarea></div>' +
     '<div class="form-group full form-actions"><button type="submit" class="btn btn-primary btn-sm">Wijzigingen opslaan</button></div></form>';
-  const hp1 = document.getElementById('hr-p1');
-  const hp2 = document.getElementById('hr-p2');
-  const hp3 = document.getElementById('hr-p3');
-  const hj = document.getElementById('hr-jaarBudget');
+  var hp1 = document.getElementById('hr-p1');
+  var hp2 = document.getElementById('hr-p2');
+  var hp3 = document.getElementById('hr-p3');
+  var hj = document.getElementById('hr-jaarBudget');
   function sync() {
-    const t = Number(hj.value) || 0;
+    var t = Number(hj.value) || 0;
     hp3.value = Math.max(0, t - (Number(hp1.value) || 0) - (Number(hp2.value) || 0));
   }
   [hp1, hp2, hj].forEach(function(el) { el.addEventListener('input', sync); });
@@ -364,10 +371,10 @@ function showHrDetail(id) {
 function saveHrEdit(e, id) {
   e.preventDefault();
   ['voornaam','achternaam','personeelsnummer','email','adres','jaarBudget','huisvesting'].forEach(function(k) {
-    const err = document.getElementById('err-hr-' + k);
+    var err = document.getElementById('err-hr-' + k);
     if (err) err.textContent = '';
   });
-  const data = {
+  var data = {
     voornaam: document.getElementById('hr-voornaam').value.trim(),
     achternaam: document.getElementById('hr-achternaam').value.trim(),
     personeelsnummer: document.getElementById('hr-personeelsnummer').value.trim(),
@@ -382,11 +389,11 @@ function saveHrEdit(e, id) {
     opmerkingen: document.getElementById('hr-opmerkingen').value.trim(),
     akkoord: true
   };
-  const errors = validateApplication(data, { requireAkkoord: false });
-  const fb = document.getElementById('hrEditFeedback');
+  var errors = validateApplication(data, { requireAkkoord: false });
+  var fb = document.getElementById('hrEditFeedback');
   if (Object.keys(errors).length) {
     Object.keys(errors).forEach(function(k) {
-      const err = document.getElementById('err-hr-' + k);
+      var err = document.getElementById('err-hr-' + k);
       if (err) err.textContent = errors[k];
     });
     fb.textContent = 'Corrigeer de fouten vooraleer op te slaan.';
@@ -417,7 +424,7 @@ document.querySelectorAll('.filter-btn').forEach(function(btn) {
   });
 });
 
-const DEMO_APPLICATIONS = [
+var DEMO_APPLICATIONS = [
   { id: 'demo_tom', voornaam: 'Tom', achternaam: 'Willems', personeelsnummer: '2101', email: 'tom.willems@logimove.be', afdeling: 'Marketing', adres: 'Molenstraat 18, 2840 Rumst', jaarBudget: 9000, p1: 0, p2: 6500, p3: 2500, huisvesting: false, opmerkingen: 'Geen bedrijfswagen. Deelautos + OV.', status: 'ingediend', submittedAt: '2026-11-08T10:15:00', lastUpdate: '2026-11-08T10:15:00' },
   { id: 'demo_riadh', voornaam: 'Riadh', achternaam: 'Mané', personeelsnummer: '2102', email: 'riadh.mane@logimove.be', afdeling: 'Accountancy', adres: 'Statiestraat 42, 2630 Aartselaar', jaarBudget: 14500, p1: 12000, p2: 1500, p3: 1000, huisvesting: false, opmerkingen: 'Wil bedrijfswagen behouden (pijler 1).', status: 'verwerkt', submittedAt: '2026-10-20T09:00:00', lastUpdate: '2026-11-03T14:20:00' },
   { id: 'demo_sara', voornaam: 'Sara', achternaam: 'Janssens', personeelsnummer: '2103', email: 'sara.janssens@logimove.be', afdeling: 'Logistiek', adres: 'Prins Boudewijnlaan 5, 2550 Kontich', jaarBudget: 12000, p1: 8500, p2: 2000, p3: 1500, huisvesting: false, opmerkingen: 'Elektrische bestelwagen.', status: 'ingediend', submittedAt: '2026-11-05T09:12:00', lastUpdate: '2026-11-05T09:12:00' },
@@ -451,7 +458,7 @@ var faq = [
   { keywords: ['pijlers', 'pijler'], answer: 'Drie pijlers: 1) zero-emissie wagen, 2) duurzame mobiliteit + huisvesting (max. 10 km van Kontich), 3) cash (38,07% bijdrage).' },
   { keywords: ['huisvesting', 'huur', 'hypotheek', 'kontich'], answer: 'Huisvesting in pijler 2 mag alleen als je woning max. <strong>10 km</strong> van Kontich ligt.' },
   { keywords: ['bijdrage', '38', 'cash', 'pijler 3'], answer: 'Op pijler 3 geldt een bijzondere werknemersbijdrage van <strong>38,07%</strong>.' },
-  { keywords: ['contact', 'hr'], answer: 'Voor persoonlijke dossiers: schakel naar HR-modus of contacteer HR.' },
+  { keywords: ['contact', 'hr'], answer: 'Voor persoonlijke dossiers: open Process manager of contacteer HR.' },
   { keywords: ['hallo', 'hoi', 'hey'], answer: 'Hallo! Stel je vraag over het mobiliteitsbudget.' }
 ];
 var fallback = 'Geen duidelijk antwoord. Neem contact op met <strong>HR</strong>.';
