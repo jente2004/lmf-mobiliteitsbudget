@@ -46,6 +46,8 @@ function applySession() {
     if (navW) navW.classList.add('hidden');
     if (navH) navH.classList.add('hidden');
     if (badge) badge.textContent = 'Niet ingelogd';
+    var topRoleOut = document.getElementById('topbarRole');
+    if (topRoleOut) topRoleOut.textContent = '\u2014';
     return;
   }
   if (loginScreen) loginScreen.classList.add('hidden');
@@ -54,6 +56,8 @@ function applySession() {
   if (navW) navW.classList.toggle('hidden', isHr);
   if (navH) navH.classList.toggle('hidden', !isHr);
   if (badge) badge.textContent = isHr ? 'Ingelogd: HR' : 'Ingelogd: Werknemer';
+  var topRole = document.getElementById('topbarRole');
+  if (topRole) topRole.textContent = isHr ? 'Rol: HR' : 'Rol: Werknemer';
   showPage(isHr ? 'hr' : 'dashboard');
 }
 
