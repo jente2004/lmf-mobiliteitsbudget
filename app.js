@@ -54,9 +54,8 @@ function upsertApplication(app) {
   const list = loadAll();
   const idx = list.findIndex(a => a.personeelsnummer === app.personeelsnummer);
   if (idx >= 0) {
-    // behoud status als HR al iets heeft gezet, tenzij opnieuw ingediend
     app.status = list[idx].status === 'afgerond' ? 'ingediend' : (list[idx].status || 'ingediend');
-    if (list[idx].status === 'afgerond') app.status = 'ingediend'; // herindiening
+    if (list[idx].status === 'afgerond') app.status = 'ingediend';
     app.id = list[idx].id;
     list[idx] = app;
   } else {
@@ -176,7 +175,7 @@ form.addEventListener('submit', (e) => {
   feedback.classList.remove('hidden');
 });
 
-// --- Dashboard (werknemer – eigen aanvraag) ---
+// --- Dashboard (werknemer) ---
 function renderDashboard() {
   const key = getCurrentUserKey();
   const data = key ? findByPersoneelsnummer(key) : null;
@@ -270,7 +269,6 @@ function renderHrOverview() {
 
   empty.classList.add('hidden');
 
-  // nieuwste eerst
   filtered.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
 
   tbody.innerHTML = filtered.map(a => {
@@ -301,7 +299,6 @@ function renderHrOverview() {
 function hrChangeStatus(id, status) {
   updateStatus(id, status);
   renderHrOverview();
-  // update werknemer-dashboard als die open staat
   if (document.getElementById('page-dashboard').classList.contains('active')) {
     renderDashboard();
   }
@@ -351,7 +348,6 @@ function statusLabel(s) {
   return { ingediend: 'Openstaand', verwerkt: 'In behandeling', afgerond: 'Afgerond' }[s] || s;
 }
 
-// Filters
 document.querySelectorAll('.filter-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -361,39 +357,188 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-// Demo data
-document.getElementById('seedDemoBtn').addEventListener('click', () => {
-  const demos = [
-    {
-      id: 'demo1', voornaam: 'Sara', achternaam: 'Janssens', personeelsnummer: '1001',
-      email: 'sara.janssens@bedrijf.be', afdeling: 'Logistiek', jaarBudget: 12000,
-      p1: 8000, p2: 2500, p3: 1500, opmerkingen: 'Wil graag een elektrische bestelwagen.',
-      status: 'ingediend', submittedAt: '2026-11-05T09:12:00', lastUpdate: '2026-11-05T09:12:00'
-    },
-    {
-      id: 'demo2', voornaam: 'Tom', achternaam: 'De Smet', personeelsnummer: '1002',
-      email: 'tom.desmet@bedrijf.be', afdeling: 'Sales', jaarBudget: 9500,
-      p1: 0, p2: 6000, p3: 3500, opmerkingen: 'Focus op fiets + OV.',
-      status: 'verwerkt', submittedAt: '2026-10-28T14:30:00', lastUpdate: '2026-11-02T11:00:00'
-    },
-    {
-      id: 'demo3', voornaam: 'Lisa', achternaam: 'Peeters', personeelsnummer: '1003',
-      email: 'lisa.peeters@bedrijf.be', afdeling: 'HR', jaarBudget: 15000,
-      p1: 11000, p2: 2000, p3: 2000, opmerkingen: '',
-      status: 'afgerond', submittedAt: '2026-09-15T10:00:00', lastUpdate: '2026-10-01T16:45:00'
-    },
-    {
-      id: 'demo4', voornaam: 'Kevin', achternaam: 'Claes', personeelsnummer: '1004',
-      email: 'kevin.claes@bedrijf.be', afdeling: 'Warehouse', jaarBudget: 8000,
-      p1: 0, p2: 5000, p3: 3000, opmerkingen: 'Huisvesting binnen 10 km.',
-      status: 'ingediend', submittedAt: '2026-11-10T08:20:00', lastUpdate: '2026-11-10T08:20:00'
-    }
-  ];
+// --- Fictieve demo-aanvragen (incl. Tom Willems & Riadh Mané) ---
+const DEMO_APPLICATIONS = [
+  {
+    id: 'demo_tom',
+    voornaam: 'Tom',
+    achternaam: 'Willems',
+    personeelsnummer: '2101',
+    email: 'tom.willems@bedrijf.be',
+    afdeling: 'Marketing',
+    jaarBudget: 9000,
+    p1: 0,
+    p2: 6500,
+    p3: 2500,
+    opmerkingen: '26 jaar, woont in Rumst. Bachelor Marketing, rijbewijs B. Kiest bewust géén bedrijfswagen. Gebruikt regelmatig deelauto\'s + OV. Anciënniteit 5 jaar, voltijds.',
+    status: 'ingediend',
+    submittedAt: '2026-11-08T10:15:00',
+    lastUpdate: '2026-11-08T10:15:00'
+  },
+  {
+    id: 'demo_riadh',
+    voornaam: 'Riadh',
+    achternaam: 'Mané',
+    personeelsnummer: '2102',
+    email: 'riadh.mane@bedrijf.be',
+    afdeling: 'Accountancy',
+    jaarBudget: 14500,
+    p1: 12000,
+    p2: 1500,
+    p3: 1000,
+    opmerkingen: '50 jaar, woont in Aartselaar. Accountant medewerker, 25 jaar anciënniteit, voltijds. Wil bedrijfswagen behouden → focus op pijler 1 (zero-emissie).',
+    status: 'verwerkt',
+    submittedAt: '2026-10-20T09:00:00',
+    lastUpdate: '2026-11-03T14:20:00'
+  },
+  {
+    id: 'demo_sara',
+    voornaam: 'Sara',
+    achternaam: 'Janssens',
+    personeelsnummer: '2103',
+    email: 'sara.janssens@bedrijf.be',
+    afdeling: 'Logistiek',
+    jaarBudget: 12000,
+    p1: 8500,
+    p2: 2000,
+    p3: 1500,
+    opmerkingen: 'Wil een elektrische bestelwagen voor klantenbezoeken.',
+    status: 'ingediend',
+    submittedAt: '2026-11-05T09:12:00',
+    lastUpdate: '2026-11-05T09:12:00'
+  },
+  {
+    id: 'demo_lisa',
+    voornaam: 'Lisa',
+    achternaam: 'Peeters',
+    personeelsnummer: '2104',
+    email: 'lisa.peeters@bedrijf.be',
+    afdeling: 'HR',
+    jaarBudget: 11000,
+    p1: 0,
+    p2: 7500,
+    p3: 3500,
+    opmerkingen: 'Fiets + treinabonnement. Woning binnen 10 km van kantoor.',
+    status: 'afgerond',
+    submittedAt: '2026-09-15T10:00:00',
+    lastUpdate: '2026-10-01T16:45:00'
+  },
+  {
+    id: 'demo_kevin',
+    voornaam: 'Kevin',
+    achternaam: 'Claes',
+    personeelsnummer: '2105',
+    email: 'kevin.claes@bedrijf.be',
+    afdeling: 'Warehouse',
+    jaarBudget: 8000,
+    p1: 0,
+    p2: 5000,
+    p3: 3000,
+    opmerkingen: 'E-bike + deelmobiliteit.',
+    status: 'ingediend',
+    submittedAt: '2026-11-10T08:20:00',
+    lastUpdate: '2026-11-10T08:20:00'
+  },
+  {
+    id: 'demo_eline',
+    voornaam: 'Eline',
+    achternaam: 'Vandenberghe',
+    personeelsnummer: '2106',
+    email: 'eline.vandenberghe@bedrijf.be',
+    afdeling: 'Sales',
+    jaarBudget: 13500,
+    p1: 10000,
+    p2: 2000,
+    p3: 1500,
+    opmerkingen: 'Veel klantenbezoeken in Vlaanderen → bedrijfswagen noodzakelijk.',
+    status: 'verwerkt',
+    submittedAt: '2026-10-12T11:30:00',
+    lastUpdate: '2026-10-28T09:15:00'
+  },
+  {
+    id: 'demo_mohamed',
+    voornaam: 'Mohamed',
+    achternaam: 'El Amrani',
+    personeelsnummer: '2107',
+    email: 'mohamed.elamrani@bedrijf.be',
+    afdeling: 'IT',
+    jaarBudget: 7500,
+    p1: 0,
+    p2: 4500,
+    p3: 3000,
+    opmerkingen: 'Voornamelijk thuiswerk + OV naar kantoor.',
+    status: 'afgerond',
+    submittedAt: '2026-08-22T14:00:00',
+    lastUpdate: '2026-09-10T10:00:00'
+  },
+  {
+    id: 'demo_anne',
+    voornaam: 'Anne',
+    achternaam: 'De Vos',
+    personeelsnummer: '2108',
+    email: 'anne.devos@bedrijf.be',
+    afdeling: 'Finance',
+    jaarBudget: 10000,
+    p1: 6000,
+    p2: 2500,
+    p3: 1500,
+    opmerkingen: 'Combinatie kleine elektrische wagen + fiets.',
+    status: 'ingediend',
+    submittedAt: '2026-11-11T16:40:00',
+    lastUpdate: '2026-11-11T16:40:00'
+  },
+  {
+    id: 'demo_pieter',
+    voornaam: 'Pieter',
+    achternaam: 'Hermans',
+    personeelsnummer: '2109',
+    email: 'pieter.hermans@bedrijf.be',
+    afdeling: 'Operations',
+    jaarBudget: 16000,
+    p1: 14000,
+    p2: 1000,
+    p3: 1000,
+    opmerkingen: 'Fulltime op de baan tussen sites.',
+    status: 'verwerkt',
+    submittedAt: '2026-10-05T08:45:00',
+    lastUpdate: '2026-10-18T13:00:00'
+  },
+  {
+    id: 'demo_sofie',
+    voornaam: 'Sofie',
+    achternaam: 'Maes',
+    personeelsnummer: '2110',
+    email: 'sofie.maes@bedrijf.be',
+    afdeling: 'Customer Service',
+    jaarBudget: 6500,
+    p1: 0,
+    p2: 4000,
+    p3: 2500,
+    opmerkingen: 'Abonnement De Lijn + Cambio deelauto.',
+    status: 'ingediend',
+    submittedAt: '2026-11-09T13:25:00',
+    lastUpdate: '2026-11-09T13:25:00'
+  }
+];
 
+function seedDemoData(force = false) {
+  const existing = loadAll();
+  if (!force && existing.length > 0) return;
+
+  const numbers = new Set(existing.map(a => a.personeelsnummer));
+  DEMO_APPLICATIONS.forEach(d => {
+    if (!numbers.has(d.personeelsnummer)) existing.push({ ...d });
+  });
+  saveAll(existing);
+}
+
+document.getElementById('seedDemoBtn').addEventListener('click', () => {
+  seedDemoData(true);
+  // force overwrite missing ones only; for full refresh we can replace
   const existing = loadAll();
   const numbers = new Set(existing.map(a => a.personeelsnummer));
-  demos.forEach(d => {
-    if (!numbers.has(d.personeelsnummer)) existing.push(d);
+  DEMO_APPLICATIONS.forEach(d => {
+    if (!numbers.has(d.personeelsnummer)) existing.push({ ...d });
   });
   saveAll(existing);
   renderHrOverview();
@@ -491,7 +636,8 @@ document.querySelectorAll('.chip').forEach(chip => {
   });
 });
 
-// Init
+// Init: laad demo-data als er nog niets staat
+seedDemoData(false);
 updateP3();
 renderDashboard();
 showPage('dashboard');
