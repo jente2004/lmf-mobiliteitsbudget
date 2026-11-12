@@ -21,7 +21,7 @@ const DEMO_USERS = {
     }
   },
   'tom@logimove.be': { password:'tom', role:'werknemer', name:'Tom Willems', personeelsnummer:'2101',
-    sap: { voornaam:'Tom', achternaam:'Willems', email:'tom@logimove.be', afdeling:'Marketing', adres:'Molenstraat 18, 2840 Rumst', totaalTCO:9000 } },
+    sap: { voornaam:'Tom', achternaam:'Willems', email:'tom@logimove.be', afdeling:'Marketing', adres:'Molenstraat 18, 2840 Rumst', totaalTCO:8400 } },
   'riadh@logimove.be': { password:'riadh', role:'werknemer', name:'Riadh Man\u00e9', personeelsnummer:'2102',
     sap: { voornaam:'Riadh', achternaam:'Man\u00e9', email:'riadh@logimove.be', afdeling:'Accountancy', adres:'Statiestraat 42, 2630 Aartselaar', totaalTCO:14500 } }
 };
@@ -456,7 +456,12 @@ var DEMO_APPLICATIONS=[
   {id:'demo_elena_fiets',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:1200,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-05T10:00:00',item:'Leasefiets',typeAanvraag:'Leasing (fiets, e-bike, motorfiets,...)'},
   {id:'demo_elena_ov',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'',status:'verwerkt',submittedAt:'2026-11-02T09:00:00',lastUpdate:'2026-11-06T10:00:00',item:'Openbaar vervoer',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
   {id:'demo_elena_huur',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Administratief bediende',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:5000,p3:0,huisvesting:true,opmerkingen:'',status:'ingediend',submittedAt:'2026-11-03T09:00:00',lastUpdate:'2026-11-07T10:00:00',item:'Huurkosten',typeAanvraag:'Huurkost'},
-  {id:'demo_tom',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:9000,p1:0,p2:6500,p3:2500,huisvesting:false,opmerkingen:'',status:'ingediend',submittedAt:'2026-11-08T10:15:00',lastUpdate:'2026-11-08T10:15:00'},
+  {id:'demo_tom_deelauto_1',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-01-15T10:00:00',lastUpdate:'2026-01-20T10:00:00',item:'Deelauto januari',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
+  {id:'demo_tom_deelauto_2',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-02-15T10:00:00',lastUpdate:'2026-02-20T10:00:00',item:'Deelauto februari',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
+  {id:'demo_tom_deelauto_3',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-03-15T10:00:00',lastUpdate:'2026-03-20T10:00:00',item:'Deelauto maart',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
+  {id:'demo_tom_deelauto_4',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'',status:'verwerkt',submittedAt:'2026-04-15T10:00:00',lastUpdate:'2026-04-20T10:00:00',item:'Deelauto april',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
+  {id:'demo_tom_deelauto_5',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'',status:'ingediend',submittedAt:'2026-05-15T10:00:00',lastUpdate:'2026-05-20T10:00:00',item:'Deelauto mei',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
+  {id:'demo_tom_deelauto_6',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:600,p3:0,huisvesting:false,opmerkingen:'',status:'ingediend',submittedAt:'2026-06-15T10:00:00',lastUpdate:'2026-06-20T10:00:00',item:'Deelauto juni',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
   {id:'demo_riadh',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Statiestraat 42, 2630 Aartselaar',jaarBudget:14500,p1:12000,p2:1500,p3:1000,huisvesting:false,opmerkingen:'',status:'verwerkt',submittedAt:'2026-10-20T09:00:00',lastUpdate:'2026-11-03T14:20:00'}
 ];
 
@@ -464,7 +469,7 @@ function seedDemoData(){
   var list = loadAll();
   var demoIds = DEMO_APPLICATIONS.map(function(d){ return d.id; });
   list = list.filter(function(a){
-    if (a.personeelsnummer === '2111' && demoIds.indexOf(a.id) === -1) return false;
+    if ((a.personeelsnummer === '2111' || a.personeelsnummer === '2101') && demoIds.indexOf(a.id) === -1) return false;
     return true;
   });
   DEMO_APPLICATIONS.forEach(function(demo){
@@ -501,12 +506,11 @@ var DEMO_FLO_MESSAGES = [
   {id:'flo_elena_fiets', appId:'demo_elena_fiets', personeelsnummer:'2111', type:'goedgekeurd', text:'Goedgekeurd: Leasefiets (€1.200). Betaling: €100/maand gedurende 12 maanden, startend in december 2026.', date:'2026-11-05T10:30:00', replies:[{from:'user',text:'Bedankt, dat is duidelijk.'}]},
   {id:'flo_elena_ov', appId:'demo_elena_ov', personeelsnummer:'2111', type:'info', text:'Openbaar vervoer (€600): we hebben nog een kopie van je abonnement nodig. Stuur dit door naar HR.', date:'2026-11-06T11:00:00', replies:[{from:'user',text:'Ik stuur het abonnement door.'}]},
   {id:'flo_elena_huur', appId:'demo_elena_huur', personeelsnummer:'2111', type:'info', text:'Huurkosten (€5.000): ontbrekende stukken. Voeg je huurcontract toe vooraleer we verder kunnen.', date:'2026-11-07T14:00:00'},
-  {id:'flo_tom', appId:'demo_tom', personeelsnummer:'2101', type:'afgewezen', text:'Aanvraag Tom Willems afgewezen. Reden: deelauto-gebruik past niet binnen de huidige pijler 2-richtlijnen. Contacteer HR voor alternatieven.', date:'2026-11-09T09:00:00'},
+  {id:'flo_tom', appId:'demo_tom_deelauto_1', personeelsnummer:'2101', type:'info', text:'Deelauto’s (€3.600): alle maandelijkse aanvragen zijn ontvangen. Resterend budget €4.800.', date:'2026-11-09T09:00:00'},
   {id:'flo_riadh', appId:'demo_riadh', personeelsnummer:'2102', type:'goedgekeurd', text:'Goedgekeurd: Bedrijfswagen (pijler 1, €12.000). Betaling via loon vanaf januari 2027.', date:'2026-11-04T15:00:00', replies:[{from:'user',text:'Oké, dank je.'}]}
 ];
 
 function seedFloMessages(){
-  // Always replace with clean demo set so old messages without personeelsnummer disappear
   saveFloMessages(DEMO_FLO_MESSAGES.slice());
 }
 seedFloMessages();
