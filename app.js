@@ -506,11 +506,8 @@ var DEMO_FLO_MESSAGES = [
 ];
 
 function seedFloMessages(){
-  var list = loadFloMessages();
-  DEMO_FLO_MESSAGES.forEach(function(m){
-    if (!list.find(function(x){ return x.id===m.id; })) list.push(m);
-  });
-  saveFloMessages(list);
+  // Always replace with clean demo set so old messages without personeelsnummer disappear
+  saveFloMessages(DEMO_FLO_MESSAGES.slice());
 }
 seedFloMessages();
 
@@ -536,7 +533,7 @@ function renderFloHistory(){
   var container = document.getElementById('floHistory');
   if (!container) return;
   var key = getCurrentUserKey();
-  var msgs = loadFloMessages().filter(function(m){ return !m.personeelsnummer || m.personeelsnummer===key; }).slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+  var msgs = loadFloMessages().filter(function(m){ return m.personeelsnummer && m.personeelsnummer===key; }).slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
   if (!msgs.length){
     container.innerHTML = '<p class="hr-empty">Nog geen meldingen.</p>';
     return;
