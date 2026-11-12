@@ -112,7 +112,13 @@ function showPage(pageId){
   if (pageId==='dashboard') renderDashboard();
   if (pageId==='aanvraag') prefillForm();
   if (pageId==='hr') renderHrOverview();
-  if (pageId==='chat' && typeof renderFloHistory==='function') renderFloHistory();
+  if (pageId==='chat') {
+    if (typeof renderFloHistory==='function') renderFloHistory();
+    var c = document.getElementById('chatMessages');
+    if (c && !c.children.length) {
+      addMessage('Hallo, ik ben Flo, jouw digitale assistent voor het mobiliteitsbudget. Stel gerust je vraag!', false);
+    }
+  }
 }
 
 document.querySelectorAll('.nav-item').forEach(function(btn){
