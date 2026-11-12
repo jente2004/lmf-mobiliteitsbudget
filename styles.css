@@ -10,9 +10,9 @@
   --border: #e1e4e8;
   --success: #1e7f4f;
   --danger: #b42318;
-  --sidebar: #1e2430;
+  --sidebar: #8B1E3F;
   --sidebar-text: #e8eaed;
-  --sidebar-muted: #9aa3ad;
+  --sidebar-muted: #f0d5dc;
   --shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
 }
 
@@ -57,7 +57,7 @@ body.app-body {
   font-weight: 500;
 }
 .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
-.nav-item.active { background: var(--maroon); color: #fff; }
+.nav-item.active { background: rgba(0,0,0,0.2); color: #fff; }
 .sidebar-footer { margin-top: auto; padding: 0.8rem 0.9rem; border-top: 1px solid rgba(255,255,255,0.08); }
 .env-badge {
   display: inline-block;
