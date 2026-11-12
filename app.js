@@ -2,6 +2,7 @@
 
 const STORAGE_KEY = 'moveflow_applications_v2';
 const CURRENT_USER_KEY = 'moveflow_current_user';
+const ROLE_KEY = 'moveflow_role';
 
 const KONTICH_ZONE = [
   'kontich', 'aartselaar', 'rumst', 'edegem', 'hove', 'lint', 'boechout',
@@ -18,22 +19,49 @@ const PAGE_TITLES = {
   hr: 'Process manager'
 };
 
-function setMode(mode) {
-  var isHr = mode === 'hr';
-  var mw = document.getElementById('modeWerknemer');
-  var mh = document.getElementById('modeHr');
-  if (mw) mw.classList.toggle('active', !isHr);
-  if (mh) mh.classList.toggle('active', isHr);
+function getRole() {
+  return sessionStorage.getItem(ROLE_KEY) || null;
+}
+
+function loginAs(role) {
+  sessionStorage.setItem(ROLE_KEY, role);
+  applySession();
+}
+
+function logout() {
+  sessionStorage.removeItem(ROLE_KEY);
+  applySession();
+}
+
+function applySession() {
+  var role = getRole();
+  var loginScreen = document.getElementById('loginScreen');
+  var appShell = document.getElementById('appShell');
   var navW = document.getElementById('navWerknemer');
   var navH = document.getElementById('navHr');
+  var badge = document.getElementById('modeBadge');
+  if (!role) {
+    if (loginScreen) loginScreen.classList.remove('hidden');
+    if (appShell) appShell.classList.add('hidden');
+    if (navW) navW.classList.add('hidden');
+    if (navH) navH.classList.add('hidden');
+    if (badge) badge.textContent = 'Niet ingelogd';
+    return;
+  }
+  if (loginScreen) loginScreen.classList.add('hidden');
+  if (appShell) appShell.classList.remove('hidden');
+  var isHr = role === 'hr';
   if (navW) navW.classList.toggle('hidden', isHr);
   if (navH) navH.classList.toggle('hidden', !isHr);
-  var badge = document.getElementById('modeBadge');
-  if (badge) badge.textContent = isHr ? 'Modus: HR' : 'Modus: Werknemer';
+  if (badge) badge.textContent = isHr ? 'Ingelogd: HR' : 'Ingelogd: Werknemer';
   showPage(isHr ? 'hr' : 'dashboard');
 }
 
 function showPage(pageId) {
+  var role = getRole();
+  if (!role) return;
+  if (role === 'hr' && pageId !== 'hr') return;
+  if (role === 'werknemer' && pageId === 'hr') return;
   document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
   document.querySelectorAll('.nav-item').forEach(function(b) { b.classList.remove('active'); });
   var page = document.getElementById('page-' + pageId);
@@ -42,17 +70,6 @@ function showPage(pageId) {
   if (btn) btn.classList.add('active');
   var title = document.getElementById('pageTitle');
   if (title) title.textContent = PAGE_TITLES[pageId] || 'MoveFlow';
-  var isHr = pageId === 'hr';
-  var mw = document.getElementById('modeWerknemer');
-  var mh = document.getElementById('modeHr');
-  if (mw) mw.classList.toggle('active', !isHr);
-  if (mh) mh.classList.toggle('active', isHr);
-  var navW = document.getElementById('navWerknemer');
-  var navH = document.getElementById('navHr');
-  if (navW) navW.classList.toggle('hidden', isHr);
-  if (navH) navH.classList.toggle('hidden', !isHr);
-  var badge = document.getElementById('modeBadge');
-  if (badge) badge.textContent = isHr ? 'Modus: HR' : 'Modus: Werknemer';
   if (pageId === 'dashboard') renderDashboard();
   if (pageId === 'aanvraag') prefillForm();
   if (pageId === 'hr') renderHrOverview();
@@ -515,4 +532,12 @@ document.querySelectorAll('.chip').forEach(function(chip) {
 });
 
 updateP3();
-setMode('werknemer');
+
+var btnLoginW = document.getElementById('loginWerknemer');
+var btnLoginH = document.getElementById('loginHr');
+var btnLogout = document.getElementById('logoutBtn');
+if (btnLoginW) btnLoginW.addEventListener('click', function() { loginAs('werknemer'); });
+if (btnLoginH) btnLoginH.addEventListener('click', function() { loginAs('hr'); });
+if (btnLogout) btnLogout.addEventListener('click', logout);
+
+applySession();
