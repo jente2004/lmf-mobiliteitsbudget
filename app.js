@@ -481,7 +481,16 @@ var DEMO_APPLICATIONS=[
 ];
 
 function seedDemoData(){
-  saveAll(DEMO_APPLICATIONS.map(function(d){ return Object.assign({}, d); }));
+  var list = loadAll();
+  DEMO_APPLICATIONS.forEach(function(demo){
+    var idx = list.findIndex(function(a){ return a.personeelsnummer === demo.personeelsnummer; });
+    if (idx >= 0){
+      list[idx] = Object.assign({}, list[idx], demo);
+    } else {
+      list.push(Object.assign({}, demo));
+    }
+  });
+  saveAll(list);
 }
 
 var seedBtn=document.getElementById('seedDemoBtn');
@@ -492,9 +501,11 @@ if (seedBtn){
     var panel=document.getElementById('hrDetail');
     if (panel) panel.classList.add('hidden');
     renderHrOverview();
+    if (getRole() === 'werknemer') renderDashboard();
   });
 }
-if (loadAll().length===0) seedDemoData();
+// Ensure demo records (incl. Elena) are always present
+seedDemoData();
 
 var faq=[
   {keywords:['hoeveel','budget','2026','minimum','maximum'],answer:'In 2026: minimum <strong>EUR 3.233</strong>, maximum <strong>EUR 17.244</strong> (of 20% brutojaarloon).'},
