@@ -1,7 +1,7 @@
-// LM Mobiliteitsbudget – client-side demo app
+// MoveFlow – client-side demo app
 // Data blijft lokaal in localStorage (geen backend)
 
-const STORAGE_KEY = 'lm_mobiliteitsbudget_v1';
+const STORAGE_KEY = 'moveflow_mobiliteitsbudget_v1';
 
 // --- Navigation ---
 function showPage(pageId) {
@@ -312,7 +312,7 @@ function addMessage(text, isUser = false) {
   const div = document.createElement('div');
   div.className = 'message ' + (isUser ? 'user' : 'bot');
   div.innerHTML = `
-    <div class="message-avatar">${isUser ? 'Jij' : 'LM'}</div>
+    <div class="message-avatar">${isUser ? 'Jij' : 'Flo'}</div>
     <div class="message-content">${text}</div>
   `;
   container.appendChild(div);
