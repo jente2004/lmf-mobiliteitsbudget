@@ -15,21 +15,23 @@
     <div class="login-card">
       <div class="login-brand">
         <img src="logo.png" alt="MoveFlow" class="login-logo" />
-        <h1>MoveFlow</h1>
-        <p>Mobiliteitsbudget · LogiMove</p>
+        <div class="login-brand-text">
+          <h1>MoveFlow</h1>
+          <p>Mobiliteitsbudget · LogiMove</p>
+        </div>
       </div>
-      <p class="login-intro">Kies hoe je wilt inloggen. Je ziet enkel de onderdelen van jouw rol.</p>
+      <p class="login-intro">Kies je rol om in te loggen. Je ziet enkel de onderdelen die bij die rol horen.</p>
       <div class="login-roles">
         <button type="button" class="login-role-btn" id="loginWerknemer">
           <span class="login-role-title">Werknemer</span>
-          <span class="login-role-desc">Mijn dossier, aanvraag, info en Flo assistent</span>
+          <span class="login-role-desc">Dossier · aanvraag · info · Flo</span>
         </button>
         <button type="button" class="login-role-btn" id="loginHr">
           <span class="login-role-title">HR</span>
-          <span class="login-role-desc">Process manager · alle aanvragen beheren</span>
+          <span class="login-role-desc">Process manager · alle aanvragen</span>
         </button>
       </div>
-      <p class="login-hint">Demo: geen wachtwoord nodig. Kies een rol om verder te gaan.</p>
+      <p class="login-hint">Demo · geen wachtwoord nodig</p>
     </div>
   </div>
 
@@ -53,13 +55,16 @@
 
       <div class="sidebar-footer">
         <span class="env-badge" id="modeBadge">Niet ingelogd</span>
-        <button type="button" class="btn-logout" id="logoutBtn">Uitloggen</button>
       </div>
     </aside>
 
     <div class="app-main">
       <header class="topbar">
         <h1 class="page-title" id="pageTitle">Mijn dossier</h1>
+        <div class="topbar-right">
+          <span class="topbar-role" id="topbarRole">—</span>
+          <button type="button" class="btn btn-secondary btn-sm" id="logoutBtn">Uitloggen</button>
+        </div>
       </header>
 
       <div class="content">
