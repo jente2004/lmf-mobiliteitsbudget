@@ -23,7 +23,7 @@ const DEMO_USERS = {
   'tom@logimove.be': { password:'tom', role:'werknemer', name:'Tom Willems', personeelsnummer:'2101',
     sap: { voornaam:'Tom', achternaam:'Willems', email:'tom@logimove.be', afdeling:'Marketing', adres:'Molenstraat 18, 2840 Rumst', totaalTCO:8400 } },
   'riadh@logimove.be': { password:'riadh', role:'werknemer', name:'Riadh Man\u00e9', personeelsnummer:'2102',
-    sap: { voornaam:'Riadh', achternaam:'Man\u00e9', email:'riadh@logimove.be', afdeling:'Accountancy', adres:'Statiestraat 42, 2630 Aartselaar', totaalTCO:14500 } }
+    sap: { voornaam:'Riadh', achternaam:'Man\u00e9', email:'riadh@logimove.be', afdeling:'Accountancy', adres:'Kerkstraat 12, 1800 Vilvoorde', totaalTCO:12000 } }
 };
 
 function getRole(){ return sessionStorage.getItem(ROLE_KEY) || null; }
@@ -466,14 +466,15 @@ var DEMO_APPLICATIONS=[
   {id:'demo_tom_deelauto_8',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:520,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-08-15T10:00:00',lastUpdate:'2026-08-20T10:00:00',item:'Deelauto augustus',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
   {id:'demo_tom_deelauto_9',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:460,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-09-15T10:00:00',lastUpdate:'2026-09-20T10:00:00',item:'Deelauto september',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
   {id:'demo_tom_deelauto_10',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:8400,p1:0,p2:570,p3:0,huisvesting:false,opmerkingen:'',status:'ingediend',submittedAt:'2026-10-15T10:00:00',lastUpdate:'2026-10-20T10:00:00',item:'Deelauto oktober',typeAanvraag:'Gedeeld vervoer (carpool, autodelen of gedeelde fiets)'},
-  {id:'demo_riadh',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Statiestraat 42, 2630 Aartselaar',jaarBudget:14500,p1:12000,p2:1500,p3:1000,huisvesting:false,opmerkingen:'',status:'verwerkt',submittedAt:'2026-10-20T09:00:00',lastUpdate:'2026-11-03T14:20:00'}
+  {id:'demo_riadh_wagen',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Kerkstraat 12, 1800 Vilvoorde',jaarBudget:12000,p1:9867,p2:0,p3:0,huisvesting:false,opmerkingen:'',status:'afgerond',submittedAt:'2026-10-01T09:00:00',lastUpdate:'2026-10-05T10:00:00',item:'Bedrijfswagen',typeAanvraag:'Bedrijfswagen'},
+  {id:'demo_riadh_huur',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Kerkstraat 12, 1800 Vilvoorde',jaarBudget:12000,p1:0,p2:2133,p3:0,huisvesting:true,opmerkingen:'',status:'afgerond',submittedAt:'2026-10-10T09:00:00',lastUpdate:'2026-10-15T10:00:00',item:'Huurkosten (afgewezen)',typeAanvraag:'Huurkost'}
 ];
 
 function seedDemoData(){
   var list = loadAll();
   var demoIds = DEMO_APPLICATIONS.map(function(d){ return d.id; });
   list = list.filter(function(a){
-    if ((a.personeelsnummer === '2111' || a.personeelsnummer === '2101') && demoIds.indexOf(a.id) === -1) return false;
+    if ((a.personeelsnummer === '2111' || a.personeelsnummer === '2101' || a.personeelsnummer === '2102') && demoIds.indexOf(a.id) === -1) return false;
     return true;
   });
   DEMO_APPLICATIONS.forEach(function(demo){
@@ -520,7 +521,8 @@ var DEMO_FLO_MESSAGES = [
   {id:'flo_tom_8', appId:'demo_tom_deelauto_8', personeelsnummer:'2101', type:'goedgekeurd', text:'Deelauto augustus: €520 ontvangen en afgehandeld.', date:'2026-08-18T11:00:00'},
   {id:'flo_tom_9', appId:'demo_tom_deelauto_9', personeelsnummer:'2101', type:'goedgekeurd', text:'Deelauto september: €460 ontvangen en afgehandeld.', date:'2026-09-18T11:00:00'},
   {id:'flo_tom_10', appId:'demo_tom_deelauto_10', personeelsnummer:'2101', type:'info', text:'Deelauto oktober: €570 ontvangen en lopend.', date:'2026-10-18T11:00:00'},
-  {id:'flo_riadh', appId:'demo_riadh', personeelsnummer:'2102', type:'goedgekeurd', text:'Goedgekeurd: Bedrijfswagen (pijler 1, €12.000). Betaling via loon vanaf januari 2027.', date:'2026-11-04T15:00:00', replies:[{from:'user',text:'Oké, dank je.'}]}
+  {id:'flo_riadh_wagen', appId:'demo_riadh_wagen', personeelsnummer:'2102', type:'goedgekeurd', text:'Goedgekeurd: Bedrijfswagen (€9.867). Betaling via loon vanaf januari 2027.', date:'2026-10-05T11:00:00', replies:[{from:'user',text:'Oké, dank je.'}]},
+  {id:'flo_riadh_huur', appId:'demo_riadh_huur', personeelsnummer:'2102', type:'afgewezen', text:'Huurkosten (€2.133) afgewezen. Reden: woonplaats Vilvoorde ligt buiten de 10 km-straal van Kontich en je werkt niet 50% van thuis.', date:'2026-10-15T11:00:00'}
 ];
 
 function seedFloMessages(){
