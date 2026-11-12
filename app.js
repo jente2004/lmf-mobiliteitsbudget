@@ -7,7 +7,7 @@ const USER_EMAIL_KEY = 'moveflow_user_email';
 
 const KONTICH_ZONE = ['kontich','aartselaar','rumst','edegem','hove','lint','boechout','mortsel','niel','boom','schelle','reeth','waarloos','vremde','borsbeek','wijnegem','schoten','brasschaat','antwerpen','wilrijk','berchem','deurne','merksem','hemiksem'];
 
-const PAGE_TITLES = { dashboard:'Mijn dossier', aanvraag:'Aanvraag', info:'Info & regels', chat:'Flo assistent', hr:'Process manager' };
+const PAGE_TITLES = { dashboard:'Mijn dossier', aanvraag:'Aanvraag', info:'Info & regels', chat:'Notificaties', hr:'Process manager' };
 
 const DEMO_USERS = {
   'hr@logimove.be': { password:'hr', role:'hr', name:'HR' },
@@ -109,7 +109,7 @@ function showPage(pageId){
   if (btn) btn.classList.add('active');
   var title=document.getElementById('pageTitle');
   if (title) {
-    if (pageId==='chat' && role==='hr') title.textContent='Notificaties';
+    if (pageId==='chat') title.textContent='Notificaties';
     else title.textContent=PAGE_TITLES[pageId]||'MoveFlow';
   }
   if (pageId==='dashboard') renderDashboard();
@@ -117,17 +117,12 @@ function showPage(pageId){
   if (pageId==='hr') renderHrOverview();
   if (pageId==='chat') {
     if (typeof renderFloHistory==='function') renderFloHistory();
-    var isHr = role==='hr';
     var quick = document.getElementById('chatQuickQuestions');
     var inputArea = document.getElementById('chatInputArea');
     var chatBox = document.querySelector('.chat-container');
-    if (quick) quick.classList.toggle('hidden', isHr);
-    if (inputArea) inputArea.classList.toggle('hidden', isHr);
-    if (chatBox) chatBox.classList.toggle('hidden', isHr);
-    var c = document.getElementById('chatMessages');
-    if (c && !c.children.length && !isHr) {
-      addMessage('Hallo, ik ben Flo, jouw digitale assistent voor het mobiliteitsbudget. Stel gerust je vraag!', false);
-    }
+    if (quick) quick.classList.add('hidden');
+    if (inputArea) inputArea.classList.add('hidden');
+    if (chatBox) chatBox.classList.add('hidden');
   }
 }
 
