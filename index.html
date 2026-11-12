@@ -21,12 +21,13 @@
         <button class="nav-btn" data-page="aanvraag">Aanvraag</button>
         <button class="nav-btn" data-page="info">Informatie</button>
         <button class="nav-btn" data-page="chat">Assistent</button>
+        <button class="nav-btn nav-hr" data-page="hr">HR-overzicht</button>
       </nav>
     </div>
   </header>
 
   <main class="main">
-    <!-- DASHBOARD -->
+    <!-- DASHBOARD (werknemer) -->
     <section id="page-dashboard" class="page active">
       <div class="container">
         <h1>Mijn mobiliteitsbudget</h1>
@@ -249,6 +250,72 @@
             <button class="chip" data-q="Wat is de bijdrage op pijler 3?">Bijdrage pijler 3</button>
             <button class="chip" data-q="Kan ik huisvestingskosten betalen?">Huisvesting</button>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- HR OVERZICHT -->
+    <section id="page-hr" class="page">
+      <div class="container">
+        <h1>HR-overzicht</h1>
+        <p class="subtitle">Alle ingediende aanvragen – bekijk, filter en wijzig de status</p>
+
+        <div class="hr-stats" id="hrStats">
+          <div class="hr-stat">
+            <span class="hr-stat-num" id="statOpen">0</span>
+            <span class="hr-stat-label">Openstaand</span>
+          </div>
+          <div class="hr-stat">
+            <span class="hr-stat-num" id="statBehandeling">0</span>
+            <span class="hr-stat-label">In behandeling</span>
+          </div>
+          <div class="hr-stat">
+            <span class="hr-stat-num" id="statAfgerond">0</span>
+            <span class="hr-stat-label">Afgerond</span>
+          </div>
+          <div class="hr-stat">
+            <span class="hr-stat-num" id="statTotaal">0</span>
+            <span class="hr-stat-label">Totaal</span>
+          </div>
+        </div>
+
+        <div class="hr-toolbar">
+          <div class="hr-filters">
+            <button class="filter-btn active" data-filter="all">Alle</button>
+            <button class="filter-btn" data-filter="ingediend">Openstaand</button>
+            <button class="filter-btn" data-filter="verwerkt">In behandeling</button>
+            <button class="filter-btn" data-filter="afgerond">Afgerond</button>
+          </div>
+          <button class="btn btn-secondary btn-sm" id="seedDemoBtn" title="Vul demo-aanvragen in">Demo-data laden</button>
+        </div>
+
+        <div class="hr-table-wrap">
+          <table class="hr-table" id="hrTable">
+            <thead>
+              <tr>
+                <th>Naam</th>
+                <th>Personeelsnr.</th>
+                <th>Afdeling</th>
+                <th>Budget</th>
+                <th>Ingediend</th>
+                <th>Status</th>
+                <th>Acties</th>
+              </tr>
+            </thead>
+            <tbody id="hrTableBody">
+              <!-- rows via JS -->
+            </tbody>
+          </table>
+          <p class="hr-empty" id="hrEmpty">Nog geen aanvragen. Werknemers dienen via "Aanvraag" in, of laad demo-data.</p>
+        </div>
+
+        <!-- Detail panel -->
+        <div class="hr-detail hidden" id="hrDetail">
+          <div class="hr-detail-header">
+            <h2 id="hrDetailTitle">Aanvraagdetails</h2>
+            <button class="btn btn-secondary btn-sm" onclick="closeHrDetail()">Sluiten</button>
+          </div>
+          <div class="hr-detail-body" id="hrDetailBody"></div>
         </div>
       </div>
     </section>
