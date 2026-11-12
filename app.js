@@ -114,8 +114,15 @@ function showPage(pageId){
   if (pageId==='hr') renderHrOverview();
   if (pageId==='chat') {
     if (typeof renderFloHistory==='function') renderFloHistory();
+    var isHr = role==='hr';
+    var quick = document.getElementById('chatQuickQuestions');
+    var inputArea = document.getElementById('chatInputArea');
+    var chatBox = document.querySelector('.chat-container');
+    if (quick) quick.classList.toggle('hidden', isHr);
+    if (inputArea) inputArea.classList.toggle('hidden', isHr);
+    if (chatBox) chatBox.classList.toggle('hidden', isHr);
     var c = document.getElementById('chatMessages');
-    if (c && !c.children.length) {
+    if (c && !c.children.length && !isHr) {
       addMessage('Hallo, ik ben Flo, jouw digitale assistent voor het mobiliteitsbudget. Stel gerust je vraag!', false);
     }
   }
