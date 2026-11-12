@@ -32,7 +32,7 @@ body {
 }
 
 .container {
-  max-width: 960px;
+  max-width: 1100px;
   margin: 0 auto;
   padding: 0 1.25rem;
 }
@@ -78,6 +78,7 @@ body {
 .nav {
   display: flex;
   gap: 0.35rem;
+  flex-wrap: wrap;
 }
 
 .nav-btn {
@@ -100,6 +101,10 @@ body {
 .nav-btn.active {
   background: var(--maroon);
   color: white;
+}
+
+.nav-hr {
+  border: 1px solid var(--border);
 }
 
 /* Main */
@@ -310,6 +315,11 @@ h1 {
   background: #F0DADA;
 }
 
+.btn-sm {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.85rem;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -352,7 +362,8 @@ h1 {
 .form-group input[type="number"],
 .form-group input[type="text"],
 .form-group input[type="email"],
-.form-group textarea {
+.form-group textarea,
+.form-group select {
   width: 100%;
   padding: 0.65rem 0.9rem;
   border: 1px solid var(--border);
@@ -364,7 +375,8 @@ h1 {
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select:focus {
   outline: none;
   border-color: var(--maroon);
   box-shadow: 0 0 0 3px rgba(92, 26, 27, 0.12);
@@ -563,6 +575,154 @@ h1 {
   border-color: var(--maroon);
 }
 
+/* ===== HR OVERZICHT ===== */
+.hr-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.hr-stat {
+  background: var(--pink-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.1rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.hr-stat-num {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--maroon);
+}
+
+.hr-stat-label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.hr-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.hr-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.filter-btn {
+  background: var(--pink-card);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filter-btn:hover {
+  border-color: var(--maroon);
+  color: var(--maroon);
+}
+
+.filter-btn.active {
+  background: var(--maroon);
+  border-color: var(--maroon);
+  color: white;
+}
+
+.hr-table-wrap {
+  background: var(--pink-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+  margin-bottom: 1.5rem;
+}
+
+.hr-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.hr-table th {
+  text-align: left;
+  padding: 0.85rem 1rem;
+  background: var(--pink-soft);
+  color: var(--maroon);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.hr-table td {
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.hr-table tr:hover td {
+  background: #FFFBFC;
+}
+
+.hr-table .status-select {
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  background: white;
+  cursor: pointer;
+}
+
+.hr-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.hr-detail {
+  background: var(--pink-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.hr-detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.hr-detail-header h2 {
+  font-size: 1.2rem;
+  color: var(--maroon);
+}
+
+.hr-detail-body p {
+  margin-bottom: 0.4rem;
+}
+
+.hr-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem 1.5rem;
+}
+
 /* Footer */
 .footer {
   background: var(--pink-card);
@@ -579,6 +739,12 @@ h1 {
 }
 
 /* Responsive */
+@media (max-width: 768px) {
+  .hr-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 @media (max-width: 640px) {
   .header-inner {
     flex-direction: column;
@@ -590,7 +756,6 @@ h1 {
   .nav {
     width: 100%;
     justify-content: center;
-    flex-wrap: wrap;
   }
 
   .nav-btn {
@@ -623,5 +788,9 @@ h1 {
 
   .logo-img {
     height: 36px;
+  }
+
+  .hr-stats {
+    grid-template-columns: 1fr 1fr;
   }
 }
