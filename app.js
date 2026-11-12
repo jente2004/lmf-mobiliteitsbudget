@@ -12,9 +12,9 @@ const PAGE_TITLES = { dashboard:'Mijn dossier', aanvraag:'Aanvraag', info:'Info 
 const DEMO_USERS = {
   'hr@logimove.be': { password:'hr', role:'hr', name:'HR' },
   'elena@logimove.be': { 
-    password:'elena', role:'werknemer', name:'Elena Costa', personeelsnummer:'2111',
+    password:'elena', role:'werknemer', name:'Elena Janssens', personeelsnummer:'2111',
     sap: {
-      voornaam:'Elena', achternaam:'Costa', email:'elena@logimove.be', afdeling:'Logistiek',
+      voornaam:'Elena', achternaam:'Janssens', email:'elena@logimove.be', afdeling:'Logistiek',
       adres:'Kerkstraat 45, 2650 Edegem', leeftijd:31, thuiswerk:'woensdag',
       ancienniteit:'9 jaar', voltijds:true, rechtBedrijfswagen:true,
       gebruik:'Leasefiets + openbaar vervoer', totaalTCO:8400
@@ -475,7 +475,7 @@ document.querySelectorAll('.filter-btn').forEach(function(btn){
 });
 
 var DEMO_APPLICATIONS=[
-  {id:'demo_elena',voornaam:'Elena',achternaam:'Costa',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:6800,p3:1600,huisvesting:false,opmerkingen:'Leasefiets (€4500) + busabonnement (€2300). Resterend €1600 uitbetalen via pijler 3 op volgende loon.',status:'verwerkt',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-10T14:00:00',breakdown:[{item:'Fietslease',bedrag:4500,pijler:2},{item:'Busabonnement',bedrag:2300,pijler:2},{item:'Uitbetaling pijler 3 (volgend loon)',bedrag:1600,pijler:3}]},
+  {id:'demo_elena',voornaam:'Elena',achternaam:'Janssens',personeelsnummer:'2111',email:'elena@logimove.be',afdeling:'Logistiek',adres:'Kerkstraat 45, 2650 Edegem',jaarBudget:8400,p1:0,p2:6800,p3:1600,huisvesting:false,opmerkingen:'Leasefiets (€4500) + busabonnement (€2300). Resterend €1600 uitbetalen via pijler 3 op volgende loon.',status:'verwerkt',submittedAt:'2026-11-01T09:00:00',lastUpdate:'2026-11-10T14:00:00',breakdown:[{item:'Fietslease',bedrag:4500,pijler:2},{item:'Busabonnement',bedrag:2300,pijler:2},{item:'Uitbetaling pijler 3 (volgend loon)',bedrag:1600,pijler:3}]},
   {id:'demo_tom',voornaam:'Tom',achternaam:'Willems',personeelsnummer:'2101',email:'tom@logimove.be',afdeling:'Marketing',adres:'Molenstraat 18, 2840 Rumst',jaarBudget:9000,p1:0,p2:6500,p3:2500,huisvesting:false,opmerkingen:'Geen bedrijfswagen. Deelautos + OV.',status:'ingediend',submittedAt:'2026-11-08T10:15:00',lastUpdate:'2026-11-08T10:15:00'},
   {id:'demo_riadh',voornaam:'Riadh',achternaam:'Man\u00e9',personeelsnummer:'2102',email:'riadh@logimove.be',afdeling:'Accountancy',adres:'Statiestraat 42, 2630 Aartselaar',jaarBudget:14500,p1:12000,p2:1500,p3:1000,huisvesting:false,opmerkingen:'Wil bedrijfswagen behouden (pijler 1).',status:'verwerkt',submittedAt:'2026-10-20T09:00:00',lastUpdate:'2026-11-03T14:20:00'}
 ];
