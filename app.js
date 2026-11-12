@@ -1,7 +1,8 @@
 // MoveFlow – client-side demo app
-// Data blijft lokaal in localStorage (geen backend)
+// Werknemer: eigen aanvraag | HR: overzicht van alle aanvragen
 
-const STORAGE_KEY = 'moveflow_mobiliteitsbudget_v1';
+const STORAGE_KEY = 'moveflow_applications_v1';
+const CURRENT_USER_KEY = 'moveflow_current_user';
 
 // --- Navigation ---
 function showPage(pageId) {
@@ -16,24 +17,65 @@ function showPage(pageId) {
 
   if (pageId === 'dashboard') renderDashboard();
   if (pageId === 'aanvraag') prefillForm();
+  if (pageId === 'hr') renderHrOverview();
 }
 
 document.querySelectorAll('.nav-btn').forEach(btn => {
   btn.addEventListener('click', () => showPage(btn.dataset.page));
 });
 
-// --- Data helpers ---
-function loadData() {
+// --- Data helpers (array of applications) ---
+function loadAll() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : null;
+    return raw ? JSON.parse(raw) : [];
   } catch {
-    return null;
+    return [];
   }
 }
 
-function saveData(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+function saveAll(list) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+function getCurrentUserKey() {
+  return localStorage.getItem(CURRENT_USER_KEY) || null;
+}
+
+function setCurrentUserKey(key) {
+  localStorage.setItem(CURRENT_USER_KEY, key);
+}
+
+function findByPersoneelsnummer(nr) {
+  return loadAll().find(a => a.personeelsnummer === nr) || null;
+}
+
+function upsertApplication(app) {
+  const list = loadAll();
+  const idx = list.findIndex(a => a.personeelsnummer === app.personeelsnummer);
+  if (idx >= 0) {
+    // behoud status als HR al iets heeft gezet, tenzij opnieuw ingediend
+    app.status = list[idx].status === 'afgerond' ? 'ingediend' : (list[idx].status || 'ingediend');
+    if (list[idx].status === 'afgerond') app.status = 'ingediend'; // herindiening
+    app.id = list[idx].id;
+    list[idx] = app;
+  } else {
+    app.id = 'app_' + Date.now() + '_' + Math.random().toString(36).slice(2, 7);
+    app.status = 'ingediend';
+    list.push(app);
+  }
+  saveAll(list);
+  setCurrentUserKey(app.personeelsnummer);
+  return app;
+}
+
+function updateStatus(id, newStatus) {
+  const list = loadAll();
+  const idx = list.findIndex(a => a.id === id);
+  if (idx < 0) return;
+  list[idx].status = newStatus;
+  list[idx].lastUpdate = new Date().toISOString();
+  saveAll(list);
 }
 
 // --- Form logic ---
@@ -47,8 +89,7 @@ function updateP3() {
   const total = Number(jaarInput.value) || 0;
   const p1 = Number(p1Input.value) || 0;
   const p2 = Number(p2Input.value) || 0;
-  const p3 = Math.max(0, total - p1 - p2);
-  p3Input.value = p3;
+  p3Input.value = Math.max(0, total - p1 - p2);
 }
 
 [jaarInput, p1Input, p2Input].forEach(el => {
@@ -56,7 +97,9 @@ function updateP3() {
 });
 
 function prefillForm() {
-  const data = loadData();
+  const key = getCurrentUserKey();
+  if (!key) return;
+  const data = findByPersoneelsnummer(key);
   if (!data) return;
 
   document.getElementById('voornaam').value = data.voornaam || '';
@@ -111,7 +154,7 @@ form.addEventListener('submit', (e) => {
     return;
   }
 
-  const data = {
+  const app = {
     voornaam,
     achternaam,
     personeelsnummer,
@@ -122,54 +165,26 @@ form.addEventListener('submit', (e) => {
     p2,
     p3,
     opmerkingen,
-    status: 'ingediend',
     submittedAt: new Date().toISOString(),
     lastUpdate: new Date().toISOString()
   };
 
-  saveData(data);
+  upsertApplication(app);
 
-  feedback.textContent = 'Je aanvraag is succesvol ingediend / bijgewerkt. Je ziet de status en je gegevens op het dashboard.';
+  feedback.textContent = 'Je aanvraag is succesvol ingediend / bijgewerkt. HR ziet ze in het overzicht.';
   feedback.className = 'feedback success';
   feedback.classList.remove('hidden');
-
-  // Simuleer progressie na een paar seconden (demo)
-  setTimeout(() => {
-    const d = loadData();
-    if (d && d.status === 'ingediend') {
-      d.status = 'verwerkt';
-      d.lastUpdate = new Date().toISOString();
-      saveData(d);
-      if (document.getElementById('page-dashboard').classList.contains('active')) {
-        renderDashboard();
-      }
-    }
-  }, 4000);
-
-  setTimeout(() => {
-    const d = loadData();
-    if (d && d.status === 'verwerkt') {
-      d.status = 'afgerond';
-      d.lastUpdate = new Date().toISOString();
-      saveData(d);
-      if (document.getElementById('page-dashboard').classList.contains('active')) {
-        renderDashboard();
-      }
-    }
-  }, 9000);
 });
 
-// --- Dashboard ---
+// --- Dashboard (werknemer – eigen aanvraag) ---
 function renderDashboard() {
-  const data = loadData();
+  const key = getCurrentUserKey();
+  const data = key ? findByPersoneelsnummer(key) : null;
   const badge = document.getElementById('statusBadge');
   const details = document.getElementById('statusDetails');
   const steps = document.querySelectorAll('.timeline-step');
 
-  // Reset timeline
-  steps.forEach(s => {
-    s.classList.remove('done', 'current');
-  });
+  steps.forEach(s => s.classList.remove('done', 'current'));
 
   if (!data) {
     badge.textContent = 'Geen aanvraag';
@@ -181,12 +196,10 @@ function renderDashboard() {
     return;
   }
 
-  // Fill amounts
   document.getElementById('p1Amount').textContent = '€ ' + data.p1.toLocaleString('nl-BE');
   document.getElementById('p2Amount').textContent = '€ ' + data.p2.toLocaleString('nl-BE');
   document.getElementById('p3Amount').textContent = '€ ' + data.p3.toLocaleString('nl-BE');
 
-  // Status
   const statusMap = {
     ingediend: { label: 'Ingediend', class: 'ingediend' },
     verwerkt: { label: 'In behandeling', class: 'verwerkt' },
@@ -197,7 +210,6 @@ function renderDashboard() {
   badge.textContent = st.label;
   badge.className = 'status-badge ' + st.class;
 
-  // Timeline
   const order = ['ingediend', 'verwerkt', 'afgerond'];
   const currentIdx = order.indexOf(data.status);
 
@@ -224,7 +236,7 @@ function renderDashboard() {
     <p><strong>Ingediend op:</strong> ${dateStr}</p>
     <p><strong>Totaal budget:</strong> € ${data.jaarBudget.toLocaleString('nl-BE')}</p>
     ${opmerkingenRegel}
-    <p style="margin-top:0.5rem;font-size:0.9rem;">Status wordt automatisch bijgewerkt in deze demo. In productie gebeurt dit door HR.</p>
+    <p style="margin-top:0.5rem;font-size:0.9rem;">HR past de status aan via het HR-overzicht.</p>
   `;
 }
 
@@ -232,79 +244,218 @@ function escapeHtml(str) {
   return String(str).replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
 }
 
-// --- Chatbot (FAQ) ---
+// --- HR Overview ---
+let hrFilter = 'all';
+
+function renderHrOverview() {
+  const list = loadAll();
+  const open = list.filter(a => a.status === 'ingediend').length;
+  const beh = list.filter(a => a.status === 'verwerkt').length;
+  const afg = list.filter(a => a.status === 'afgerond').length;
+
+  document.getElementById('statOpen').textContent = open;
+  document.getElementById('statBehandeling').textContent = beh;
+  document.getElementById('statAfgerond').textContent = afg;
+  document.getElementById('statTotaal').textContent = list.length;
+
+  const filtered = hrFilter === 'all' ? list : list.filter(a => a.status === hrFilter);
+  const tbody = document.getElementById('hrTableBody');
+  const empty = document.getElementById('hrEmpty');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.classList.remove('hidden');
+    return;
+  }
+
+  empty.classList.add('hidden');
+
+  // nieuwste eerst
+  filtered.sort((a, b) => new Date(b.submittedAt) - new Date(a.submittedAt));
+
+  tbody.innerHTML = filtered.map(a => {
+    const naam = [a.voornaam, a.achternaam].filter(Boolean).join(' ');
+    const dateStr = new Date(a.submittedAt).toLocaleDateString('nl-BE');
+    return `
+      <tr data-id="${a.id}">
+        <td><strong>${escapeHtml(naam)}</strong><br><small style="color:#6B4A4A">${escapeHtml(a.email || '')}</small></td>
+        <td>${escapeHtml(a.personeelsnummer || '—')}</td>
+        <td>${escapeHtml(a.afdeling || '—')}</td>
+        <td>€ ${Number(a.jaarBudget).toLocaleString('nl-BE')}</td>
+        <td>${dateStr}</td>
+        <td>
+          <select class="status-select" data-id="${a.id}" onchange="hrChangeStatus('${a.id}', this.value)">
+            <option value="ingediend" ${a.status === 'ingediend' ? 'selected' : ''}>Openstaand</option>
+            <option value="verwerkt" ${a.status === 'verwerkt' ? 'selected' : ''}>In behandeling</option>
+            <option value="afgerond" ${a.status === 'afgerond' ? 'selected' : ''}>Afgerond</option>
+          </select>
+        </td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="showHrDetail('${a.id}')">Bekijk</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+}
+
+function hrChangeStatus(id, status) {
+  updateStatus(id, status);
+  renderHrOverview();
+  // update werknemer-dashboard als die open staat
+  if (document.getElementById('page-dashboard').classList.contains('active')) {
+    renderDashboard();
+  }
+}
+
+function showHrDetail(id) {
+  const app = loadAll().find(a => a.id === id);
+  if (!app) return;
+
+  const panel = document.getElementById('hrDetail');
+  const body = document.getElementById('hrDetailBody');
+  const title = document.getElementById('hrDetailTitle');
+
+  const naam = [app.voornaam, app.achternaam].filter(Boolean).join(' ');
+  title.textContent = `Aanvraag – ${naam}`;
+
+  const dateStr = new Date(app.submittedAt).toLocaleString('nl-BE', {
+    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+
+  body.innerHTML = `
+    <div class="hr-detail-grid">
+      <p><strong>Naam:</strong> ${escapeHtml(naam)}</p>
+      <p><strong>Personeelsnummer:</strong> ${escapeHtml(app.personeelsnummer)}</p>
+      <p><strong>E-mail:</strong> ${escapeHtml(app.email)}</p>
+      <p><strong>Afdeling:</strong> ${escapeHtml(app.afdeling || '—')}</p>
+      <p><strong>Ingediend op:</strong> ${dateStr}</p>
+      <p><strong>Status:</strong> <span class="status-badge ${app.status}">${statusLabel(app.status)}</span></p>
+    </div>
+    <hr style="margin:1rem 0;border:none;border-top:1px solid var(--border)">
+    <p><strong>Totaal budget:</strong> € ${Number(app.jaarBudget).toLocaleString('nl-BE')}</p>
+    <p><strong>Pijler 1 (wagen):</strong> € ${Number(app.p1).toLocaleString('nl-BE')}</p>
+    <p><strong>Pijler 2 (duurzaam):</strong> € ${Number(app.p2).toLocaleString('nl-BE')}</p>
+    <p><strong>Pijler 3 (cash):</strong> € ${Number(app.p3).toLocaleString('nl-BE')}</p>
+    ${app.opmerkingen ? `<p style="margin-top:0.75rem"><strong>Opmerkingen:</strong> ${escapeHtml(app.opmerkingen)}</p>` : ''}
+  `;
+
+  panel.classList.remove('hidden');
+  panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function closeHrDetail() {
+  document.getElementById('hrDetail').classList.add('hidden');
+}
+
+function statusLabel(s) {
+  return { ingediend: 'Openstaand', verwerkt: 'In behandeling', afgerond: 'Afgerond' }[s] || s;
+}
+
+// Filters
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    hrFilter = btn.dataset.filter;
+    renderHrOverview();
+  });
+});
+
+// Demo data
+document.getElementById('seedDemoBtn').addEventListener('click', () => {
+  const demos = [
+    {
+      id: 'demo1', voornaam: 'Sara', achternaam: 'Janssens', personeelsnummer: '1001',
+      email: 'sara.janssens@bedrijf.be', afdeling: 'Logistiek', jaarBudget: 12000,
+      p1: 8000, p2: 2500, p3: 1500, opmerkingen: 'Wil graag een elektrische bestelwagen.',
+      status: 'ingediend', submittedAt: '2026-11-05T09:12:00', lastUpdate: '2026-11-05T09:12:00'
+    },
+    {
+      id: 'demo2', voornaam: 'Tom', achternaam: 'De Smet', personeelsnummer: '1002',
+      email: 'tom.desmet@bedrijf.be', afdeling: 'Sales', jaarBudget: 9500,
+      p1: 0, p2: 6000, p3: 3500, opmerkingen: 'Focus op fiets + OV.',
+      status: 'verwerkt', submittedAt: '2026-10-28T14:30:00', lastUpdate: '2026-11-02T11:00:00'
+    },
+    {
+      id: 'demo3', voornaam: 'Lisa', achternaam: 'Peeters', personeelsnummer: '1003',
+      email: 'lisa.peeters@bedrijf.be', afdeling: 'HR', jaarBudget: 15000,
+      p1: 11000, p2: 2000, p3: 2000, opmerkingen: '',
+      status: 'afgerond', submittedAt: '2026-09-15T10:00:00', lastUpdate: '2026-10-01T16:45:00'
+    },
+    {
+      id: 'demo4', voornaam: 'Kevin', achternaam: 'Claes', personeelsnummer: '1004',
+      email: 'kevin.claes@bedrijf.be', afdeling: 'Warehouse', jaarBudget: 8000,
+      p1: 0, p2: 5000, p3: 3000, opmerkingen: 'Huisvesting binnen 10 km.',
+      status: 'ingediend', submittedAt: '2026-11-10T08:20:00', lastUpdate: '2026-11-10T08:20:00'
+    }
+  ];
+
+  const existing = loadAll();
+  const numbers = new Set(existing.map(a => a.personeelsnummer));
+  demos.forEach(d => {
+    if (!numbers.has(d.personeelsnummer)) existing.push(d);
+  });
+  saveAll(existing);
+  renderHrOverview();
+});
+
+// --- Chatbot ---
 const faq = [
   {
     keywords: ['hoeveel', 'bedraagt', 'budget', '2026', 'minimum', 'maximum', 'grens'],
-    answer: 'In 2026 bedraagt het mobiliteitsbudget minimum <strong>€ 3.233</strong> en maximum <strong>€ 17.244</strong> per kalenderjaar. Bovendien mag het nooit hoger zijn dan 20% van je totale brutojaarloon. Het exacte bedrag hangt af van de TCO (Total Cost of Ownership) van de bedrijfswagen die je inruilt.'
+    answer: 'In 2026 bedraagt het mobiliteitsbudget minimum <strong>€ 3.233</strong> en maximum <strong>€ 17.244</strong> per kalenderjaar. Bovendien mag het nooit hoger zijn dan 20% van je totale brutojaarloon.'
   },
   {
     keywords: ['drie pijlers', 'pijlers', 'wat zijn de pijlers', 'pijler 1', 'pijler 2', 'pijler 3'],
-    answer: 'Het mobiliteitsbudget heeft drie pijlers:<br><br>① <strong>Pijler 1</strong> – Milieuvriendelijke bedrijfswagen (vanaf 2026 uitsluitend zero-emissie).<br>② <strong>Pijler 2</strong> – Duurzame mobiliteit (fiets, OV, deelmobiliteit…) en bepaalde huisvestingskosten (woning max. 10 km van de werkplek).<br>③ <strong>Pijler 3</strong> – Het restsaldo dat cash wordt uitbetaald (met 38,07% bijzondere bijdrage).'
+    answer: 'Het mobiliteitsbudget heeft drie pijlers:<br><br>① <strong>Pijler 1</strong> – Milieuvriendelijke bedrijfswagen (vanaf 2026 uitsluitend zero-emissie).<br>② <strong>Pijler 2</strong> – Duurzame mobiliteit en bepaalde huisvestingskosten.<br>③ <strong>Pijler 3</strong> – Cash-restsaldo (met 38,07% bijdrage).'
   },
   {
     keywords: ['aanmerking', 'wie', 'recht op', 'in aanmerking', 'voorwaarden'],
-    answer: 'Je komt in aanmerking als je een bedrijfswagen hebt of er volgens het bedrijfswagenbeleid van je werkgever recht op hebt. De werkgever moet het mobiliteitsbudget ook hebben ingevoerd. De aanvraag gebeurt schriftelijk.'
+    answer: 'Je komt in aanmerking als je een bedrijfswagen hebt of er volgens het bedrijfswagenbeleid recht op hebt. De werkgever moet het systeem hebben ingevoerd.'
   },
   {
     keywords: ['bijdrage', '38', 'pijler 3', 'cash', 'uitbetaling', 'netto'],
-    answer: 'Op het cash-saldo van pijler 3 wordt een bijzondere werknemersbijdrage van <strong>38,07%</strong> ingehouden. Deze vervangt de gewone sociale bijdragen en belastingen. Het nettobedrag is daardoor meestal gunstiger dan gewoon loon.'
+    answer: 'Op het cash-saldo van pijler 3 wordt een bijzondere werknemersbijdrage van <strong>38,07%</strong> ingehouden.'
   },
   {
     keywords: ['huisvesting', 'huur', 'hypotheek', 'woning', '10 km'],
-    answer: 'Onder voorwaarden mag je in pijler 2 huisvestingskosten (huur, interesten of kapitaalsaflossingen van een hypothecaire lening) betalen. De woning moet max. <strong>10 kilometer in vogelvlucht</strong> van je normale werkplek liggen.'
+    answer: 'Onder voorwaarden mag je in pijler 2 huisvestingskosten betalen. De woning moet max. <strong>10 kilometer in vogelvlucht</strong> van je normale werkplek liggen.'
   },
   {
-    keywords: ['fiets', 'elektrische fiets', 'e-bike', 'zachte mobiliteit'],
-    answer: 'Ja! Onder pijler 2 vallen aankoop, leasing, huur, onderhoud en stalling van een (elektrische) fiets of speed pedelec, alsook veiligheidsuitrusting (helm, fluo…).'
+    keywords: ['fiets', 'elektrische fiets', 'e-bike'],
+    answer: 'Ja! Onder pijler 2 vallen aankoop, leasing, huur en onderhoud van een (elektrische) fiets of speed pedelec.'
   },
   {
     keywords: ['openbaar vervoer', 'trein', 'bus', 'tram', 'metro', 'abonnement'],
-    answer: 'Abonnementen en losse tickets voor openbaar vervoer (trein, tram, bus, metro) vallen onder pijler 2 en zijn fiscaal zeer interessant (vrijgesteld van belastingen en RSZ binnen de wettelijke voorwaarden).'
+    answer: 'Abonnementen en tickets voor openbaar vervoer vallen onder pijler 2 en zijn fiscaal interessant.'
   },
   {
-    keywords: ['wanneer', 'indienen', 'aanvragen', 'termijn', 'data'],
-    answer: 'Je kunt een aanvraag indienen zodra je werkgever het systeem heeft ingevoerd. De aanvraag en de positieve beslissing van de werkgever gebeuren schriftelijk. Uitbetaling van pijler 3 gebeurt uiterlijk met het loon van de eerste maand van het volgende kalenderjaar.'
+    keywords: ['wanneer', 'indienen', 'aanvragen', 'termijn'],
+    answer: 'Je kunt een aanvraag indienen zodra je werkgever het systeem heeft ingevoerd. Uitbetaling pijler 3 gebeurt uiterlijk met het loon van de eerste maand van het volgende kalenderjaar.'
   },
   {
-    keywords: ['elektrisch', 'zero', 'co2', '2026', 'wagen', 'bedrijfswagen'],
-    answer: 'Vanaf 1 januari 2026 mag pijler 1 enkel nog een wagen zonder CO₂-uitstoot bevatten (besteld of geleased vanaf die datum). Vóór 2026 golden ook wagens met max. 95 g/km CO₂ onder bepaalde voorwaarden.'
+    keywords: ['contact', 'hr', 'help'],
+    answer: 'Voor persoonlijke of complexe vragen kun je het best rechtstreeks contact opnemen met HR.'
   },
   {
-    keywords: ['wijzigen', 'aanpassen', 'verdelen', 'verdeling'],
-    answer: 'Je kunt je verdeling over de drie pijlers wijzigen via de pagina “Aanvraag”. De som van de drie pijlers moet altijd gelijk zijn aan je totale jaarlijkse mobiliteitsbudget.'
-  },
-  {
-    keywords: ['contact', 'hr', 'mensen', 'iemand', 'help'],
-    answer: 'Voor persoonlijke of complexe vragen kun je het best rechtstreeks contact opnemen met HR. Ik kan algemene informatie geven, maar HR heeft toegang tot je individuele dossier.'
-  },
-  {
-    keywords: ['hallo', 'hoi', 'hey', 'goedemorgen', 'goedemiddag'],
-    answer: 'Hallo! Stel gerust je vraag over het mobiliteitsbudget. Ik help je graag met de drie pijlers, bedragen, voorwaarden of de status van je aanvraag.'
+    keywords: ['hallo', 'hoi', 'hey', 'goedemorgen'],
+    answer: 'Hallo! Stel gerust je vraag over het mobiliteitsbudget.'
   }
 ];
 
-const fallback = `Ik heb niet meteen een duidelijk antwoord op die vraag.  
-Voor persoonlijke situaties of details die ik niet ken, raad ik je aan om <strong>rechtstreeks contact op te nemen met HR</strong>. Zij kunnen je dossier bekijken en je verder helpen.`;
+const fallback = `Ik heb niet meteen een duidelijk antwoord. Voor persoonlijke situaties raad ik je aan om <strong>rechtstreeks contact op te nemen met HR</strong>.`;
 
 function findAnswer(question) {
   const q = question.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  let best = null;
-  let bestScore = 0;
-
+  let best = null, bestScore = 0;
   for (const item of faq) {
     let score = 0;
     for (const kw of item.keywords) {
       if (q.includes(kw.toLowerCase())) score += 1;
     }
-    if (score > bestScore) {
-      bestScore = score;
-      best = item;
-    }
+    if (score > bestScore) { bestScore = score; best = item; }
   }
-
-  if (bestScore >= 1) return best.answer;
-  return fallback;
+  return bestScore >= 1 ? best.answer : fallback;
 }
 
 function addMessage(text, isUser = false) {
@@ -323,18 +474,13 @@ function handleChat() {
   const input = document.getElementById('chatInput');
   const text = input.value.trim();
   if (!text) return;
-
   addMessage(escapeHtml(text), true);
   input.value = '';
-
-  setTimeout(() => {
-    const answer = findAnswer(text);
-    addMessage(answer, false);
-  }, 400);
+  setTimeout(() => addMessage(findAnswer(text), false), 400);
 }
 
 document.getElementById('chatSend').addEventListener('click', handleChat);
-document.getElementById('chatInput').addEventListener('keydown', (e) => {
+document.getElementById('chatInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') handleChat();
 });
 
