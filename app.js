@@ -319,7 +319,7 @@ function renderDashboard(){
     var d=a.submittedAt?new Date(a.submittedAt).toLocaleDateString('nl-BE'):'-';
     var item=a.typeAanvraag||a.item||'Aanvraag';
     var statusLabel = a.status==='afgerond' ? 'Afgehandeld' : (a.status==='verwerkt' ? 'In behandeling' : 'Lopend');
-    return '<tr><td>'+escapeHtml(d)+'</td><td><strong>'+escapeHtml(item)+'</strong></td><td>EUR '+Number((a.p1||0)+(a.p2||0)+(a.p3||0)).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+st.class+'">'+statusLabel+'</span></td></tr>';
+    return '<tr><td>'+escapeHtml(d)+'</td><td><strong>'+escapeHtml(item)+'</strong></td><td>EUR '+Number((a.p1||0)+(a.p2)||0)+(a.p3||0)).toLocaleString('nl-BE')+'</td><td><span class="status-badge '+st.class+'">'+statusLabel+'</span></td></tr>';
   }).join('');
 
   var barContainer=document.getElementById('budgetBarContainer');
@@ -498,11 +498,11 @@ function loadFloMessages(){
 function saveFloMessages(list){ localStorage.setItem(FLO_MESSAGES_KEY, JSON.stringify(list)); }
 
 var DEMO_FLO_MESSAGES = [
-  {id:'flo_elena_fiets', appId:'demo_elena_fiets', type:'goedgekeurd', text:'Goedgekeurd: Leasefiets (€1.200). Betaling: €100/maand gedurende 12 maanden, startend in december 2026.', date:'2026-11-05T10:30:00', replies:[{from:'user',text:'Bedankt, dat is duidelijk.'}]},
-  {id:'flo_elena_ov', appId:'demo_elena_ov', type:'info', text:'Openbaar vervoer (€600): we hebben nog een kopie van je abonnement nodig. Stuur dit door naar HR.', date:'2026-11-06T11:00:00', replies:[{from:'user',text:'Ik stuur het abonnement door.'}]},
-  {id:'flo_elena_huur', appId:'demo_elena_huur', type:'info', text:'Huurkosten (€5.000): ontbrekende stukken. Voeg je huurcontract toe vooraleer we verder kunnen.', date:'2026-11-07T14:00:00'},
-  {id:'flo_tom', appId:'demo_tom', type:'afgewezen', text:'Aanvraag Tom Willems afgewezen. Reden: deelauto-gebruik past niet binnen de huidige pijler 2-richtlijnen. Contacteer HR voor alternatieven.', date:'2026-11-09T09:00:00'},
-  {id:'flo_riadh', appId:'demo_riadh', type:'goedgekeurd', text:'Goedgekeurd: Bedrijfswagen (pijler 1, €12.000). Betaling via loon vanaf januari 2027.', date:'2026-11-04T15:00:00', replies:[{from:'user',text:'Oké, dank je.'}]}
+  {id:'flo_elena_fiets', appId:'demo_elena_fiets', personeelsnummer:'2111', type:'goedgekeurd', text:'Goedgekeurd: Leasefiets (€1.200). Betaling: €100/maand gedurende 12 maanden, startend in december 2026.', date:'2026-11-05T10:30:00', replies:[{from:'user',text:'Bedankt, dat is duidelijk.'}]},
+  {id:'flo_elena_ov', appId:'demo_elena_ov', personeelsnummer:'2111', type:'info', text:'Openbaar vervoer (€600): we hebben nog een kopie van je abonnement nodig. Stuur dit door naar HR.', date:'2026-11-06T11:00:00', replies:[{from:'user',text:'Ik stuur het abonnement door.'}]},
+  {id:'flo_elena_huur', appId:'demo_elena_huur', personeelsnummer:'2111', type:'info', text:'Huurkosten (€5.000): ontbrekende stukken. Voeg je huurcontract toe vooraleer we verder kunnen.', date:'2026-11-07T14:00:00'},
+  {id:'flo_tom', appId:'demo_tom', personeelsnummer:'2101', type:'afgewezen', text:'Aanvraag Tom Willems afgewezen. Reden: deelauto-gebruik past niet binnen de huidige pijler 2-richtlijnen. Contacteer HR voor alternatieven.', date:'2026-11-09T09:00:00'},
+  {id:'flo_riadh', appId:'demo_riadh', personeelsnummer:'2102', type:'goedgekeurd', text:'Goedgekeurd: Bedrijfswagen (pijler 1, €12.000). Betaling via loon vanaf januari 2027.', date:'2026-11-04T15:00:00', replies:[{from:'user',text:'Oké, dank je.'}]}
 ];
 
 function seedFloMessages(){
@@ -535,7 +535,8 @@ function openFloThread(msgId){
 function renderFloHistory(){
   var container = document.getElementById('floHistory');
   if (!container) return;
-  var msgs = loadFloMessages().slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+  var key = getCurrentUserKey();
+  var msgs = loadFloMessages().filter(function(m){ return !m.personeelsnummer || m.personeelsnummer===key; }).slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
   if (!msgs.length){
     container.innerHTML = '<p class="hr-empty">Nog geen meldingen.</p>';
     return;
