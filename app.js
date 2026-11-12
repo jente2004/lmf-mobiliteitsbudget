@@ -112,6 +112,7 @@ function showPage(pageId){
   if (pageId==='dashboard') renderDashboard();
   if (pageId==='aanvraag') prefillForm();
   if (pageId==='hr') renderHrOverview();
+  if (pageId==='chat' && typeof renderFloHistory==='function') renderFloHistory();
 }
 
 document.querySelectorAll('.nav-item').forEach(function(btn){
@@ -490,6 +491,44 @@ if (seedBtn){
   });
 }
 seedDemoData();
+
+const FLO_MESSAGES_KEY = 'moveflow_flo_messages';
+function loadFloMessages(){
+  try { var r=localStorage.getItem(FLO_MESSAGES_KEY); return r?JSON.parse(r):[]; } catch(e){ return []; }
+}
+function saveFloMessages(list){ localStorage.setItem(FLO_MESSAGES_KEY, JSON.stringify(list)); }
+
+var DEMO_FLO_MESSAGES = [
+  {id:'flo_elena_fiets', appId:'demo_elena_fiets', type:'goedgekeurd', text:'Goedgekeurd: Leasefiets (€1.200). Betaling: €100/maand gedurende 12 maanden, startend in december 2026.', date:'2026-11-05T10:30:00'},
+  {id:'flo_elena_ov', appId:'demo_elena_ov', type:'info', text:'Openbaar vervoer (€600): we hebben nog een kopie van je abonnement nodig. Stuur dit door naar HR.', date:'2026-11-06T11:00:00'},
+  {id:'flo_elena_huur', appId:'demo_elena_huur', type:'info', text:'Huurkosten (€5.000): ontbrekende stukken. Voeg je huurcontract toe vooraleer we verder kunnen.', date:'2026-11-07T14:00:00'},
+  {id:'flo_tom', appId:'demo_tom', type:'afgewezen', text:'Aanvraag Tom Willems afgewezen. Reden: deelauto-gebruik past niet binnen de huidige pijler 2-richtlijnen. Contacteer HR voor alternatieven.', date:'2026-11-09T09:00:00'},
+  {id:'flo_riadh', appId:'demo_riadh', type:'goedgekeurd', text:'Goedgekeurd: Bedrijfswagen (pijler 1, €12.000). Betaling via loon vanaf januari 2027.', date:'2026-11-04T15:00:00'}
+];
+
+function seedFloMessages(){
+  var list = loadFloMessages();
+  DEMO_FLO_MESSAGES.forEach(function(m){
+    if (!list.find(function(x){ return x.id===m.id; })) list.push(m);
+  });
+  saveFloMessages(list);
+}
+seedFloMessages();
+
+function renderFloHistory(){
+  var container = document.getElementById('floHistory');
+  if (!container) return;
+  var msgs = loadFloMessages().slice().sort(function(a,b){ return new Date(b.date)-new Date(a.date); });
+  if (!msgs.length){
+    container.innerHTML = '<p class="hr-empty">Nog geen meldingen.</p>';
+    return;
+  }
+  container.innerHTML = msgs.map(function(m){
+    var label = m.type==='goedgekeurd'?'Goedgekeurd':(m.type==='afgewezen'?'Afgewezen':'Extra info nodig');
+    var d = new Date(m.date).toLocaleString('nl-BE');
+    return '<div class="panel" style="margin-bottom:0.6rem;padding:0.7rem"><div style="font-size:0.75rem;color:var(--muted)">'+d+' · '+label+'</div><div style="margin-top:0.3rem">'+escapeHtml(m.text)+'</div></div>';
+  }).join('');
+}
 
 var faq=[
   {keywords:['hoeveel','budget','2026','minimum','maximum'],answer:'In 2026: minimum <strong>EUR 3.233</strong>, maximum <strong>EUR 17.244</strong> (of 20% brutojaarloon).'},
